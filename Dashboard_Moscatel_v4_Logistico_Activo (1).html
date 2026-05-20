@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Empresa Autónoma Moscatel Perú · 8 Agentes IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#080d18;--bg2:#0f1825;--bg3:#172030;--bg4:#1f2e45;
+  --gold:#c9a227;--gold2:#f0c44a;
+  --teal:#00c8a0;--blue:#3a8ef6;--red:#f05a5a;
+  --purple:#9c6fde;--green:#3db87a;--orange:#f09040;--pink:#e05c9a;
+  --text:#e8eaf0;--text2:#8b9ab5;--text3:#3d4f6a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(201,162,39,0.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px}
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border2);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-ic{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c9a227,#6e4a08);display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-tx{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.logo-sub{font-size:10px;color:var(--text2)}
+.hdr-r{display:flex;align-items:center;gap:12px}
+.live-b{display:flex;align-items:center;gap:5px;background:rgba(0,200,160,.12);border:1px solid rgba(0,200,160,.3);padding:3px 9px;border-radius:20px;font-size:10px;color:var(--teal);font-weight:600}
+.live-d{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 1.4s infinite}
+.api-badge{background:rgba(58,142,246,.12);border:1px solid rgba(58,142,246,.3);padding:3px 9px;border-radius:20px;font-size:10px;color:var(--blue);font-weight:600}
+.clk{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+/* TABS */
+.tabs{display:flex;gap:2px;padding:8px 24px 0;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:7px 13px;border-radius:6px 6px 0 0;font-size:11px;cursor:pointer;color:var(--text2);transition:all .2s;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold2);background:rgba(201,162,39,.09)}
+.tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.04)}
+/* MAIN */
+.main{padding:18px 24px;display:none}
+.main.active{display:block}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px}
+.g16{display:grid;grid-template-columns:1fr 1.6fr;gap:12px;margin-bottom:12px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.mb{margin-bottom:12px}
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;overflow:hidden}
+.ctitle{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center}
+.cbadge{font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(0,200,160,.15);color:var(--teal);font-family:'JetBrains Mono',monospace}
+.cbadge.blue{background:rgba(58,142,246,.15);color:var(--blue)}
+.cbadge.gold{background:rgba(201,162,39,.15);color:var(--gold2)}
+.cbadge.sim{background:rgba(61,79,106,.2);color:var(--text3)}
+.cbadge.red{background:rgba(240,90,90,.15);color:var(--red)}
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.kcard{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px;position:relative;overflow:hidden;transition:border-color .2s}
+.kcard:hover{border-color:rgba(201,162,39,.3)}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--gold))}
+.klbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.kval{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;line-height:1}
+.ksub{font-size:10px;color:var(--text2);margin-top:4px}
+.kico{position:absolute;right:11px;top:11px;font-size:16px;opacity:.32}
+.kbadge{font-size:9px;padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-weight:600;display:inline-block;margin-top:4px}
+.kbadge.real{background:rgba(0,200,160,.15);color:var(--teal)}
+.kbadge.sim{background:rgba(255,255,255,.07);color:var(--text3)}
+/* FILTER BAR */
+.fbar{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.flbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.fbtn{padding:4px 11px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;transition:all .18s}
+.fbtn.active{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold2)}
+.fbtn:hover{border-color:var(--text3);color:var(--text)}
+/* API BAR */
+.api-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px;padding:9px 13px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:10px;color:var(--text2);align-items:center}
+.api-dot{width:6px;height:6px;border-radius:50%}
+.dot-ok{background:var(--teal)} .dot-warn{background:var(--orange)} .dot-off{background:var(--text3)}
+/* ORCHESTRATOR */
+.orch-panel{background:linear-gradient(135deg,rgba(201,162,39,.08),rgba(156,111,222,.06));border:1px solid rgba(201,162,39,.35);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.orch-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--purple),var(--teal))}
+.orch-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.orch-icon{width:42px;height:42px;border-radius:10px;background:rgba(201,162,39,.2);display:flex;align-items:center;justify-content:center;font-size:21px;border:1px solid rgba(201,162,39,.4);animation:ring 2s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(201,162,39,.4)}70%{box-shadow:0 0 0 8px rgba(201,162,39,0)}100%{box-shadow:0 0 0 0 rgba(201,162,39,0)}}
+.orch-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.orch-role{font-size:10px;color:var(--text2);margin-top:2px}
+.orch-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.orch-m{background:rgba(0,0,0,.25);border-radius:6px;padding:9px;border:1px solid rgba(255,255,255,.05)}
+.orch-ml{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.orch-mv{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold2)}
+.orch-decision{padding:10px 12px;background:rgba(201,162,39,.06);border-radius:7px;border:1px solid rgba(201,162,39,.2);font-size:11px;color:var(--text2);line-height:1.65}
+/* AGENTS GRID */
+.a8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.agcard{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px;transition:all .22s;position:relative;overflow:hidden}
+.agcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,var(--text3))}
+.agcard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.aghead{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.agico{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.agname{font-family:'Syne',sans-serif;font-size:12px;font-weight:700}
+.agrole{font-size:9px;color:var(--text3);margin-top:1px;line-height:1.3}
+.agpill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:600;font-family:'JetBrains Mono',monospace;margin-bottom:7px;border:1px solid}
+.agpill.ok{background:rgba(0,200,160,.12);color:var(--teal);border-color:rgba(0,200,160,.3)}
+.agpill.dev{background:rgba(61,79,106,.15);color:var(--text3);border-color:var(--border)}
+.agpill.sim{background:rgba(240,144,64,.12);color:var(--orange);border-color:rgba(240,144,64,.3)}
+.sdot{width:5px;height:5px;border-radius:50%;animation:pulse 1.4s infinite}
+.agm{display:flex;flex-direction:column;gap:4px}
+.agmrow{display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.agmrow:last-child{border:none}
+.agmk{color:var(--text3)} .agmv{font-family:'JetBrains Mono',monospace;font-weight:500}
+.agmv.ok{color:var(--teal)} .agmv.warn{color:var(--orange)} .agmv.bad{color:var(--red)}
+.agbrief{margin-top:7px;padding:6px 8px;background:rgba(0,0,0,.2);border-radius:5px;font-size:9px;color:var(--text2);line-height:1.5;min-height:24px}
+.agsrc{margin-top:4px;font-size:8px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+/* SHEETS PANEL */
+.sheet-panel{background:var(--bg3);border:1px solid rgba(52,168,83,.35);border-top:3px solid #34A853;border-radius:10px;padding:14px;margin-bottom:14px}
+.sheet-inp{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:7px 11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;transition:border-color .2s;min-width:180px}
+.sheet-inp:focus{border-color:rgba(52,168,83,.5)}
+.sbtn{padding:7px 13px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;border:1px solid}
+.sbtn-g{background:rgba(52,168,83,.15);color:#34A853;border-color:rgba(52,168,83,.4)}
+.sbtn-g:hover{background:rgba(52,168,83,.28)}
+.sbtn-t{background:rgba(0,200,160,.12);color:var(--teal);border-color:rgba(0,200,160,.4)}
+.sbtn-t:hover{background:rgba(0,200,160,.22)}
+/* COMPETITOR TABLE */
+.ctbl{width:100%;border-collapse:collapse}
+.ctbl th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:0 10px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.ctbl td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);font-size:11px;color:var(--text2)}
+.ctbl tr:hover td{background:rgba(255,255,255,.02)}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.tag-t{background:rgba(139,154,181,.15);color:#8b9ab5}
+.tag-ai{background:rgba(156,111,222,.15);color:#9c6fde}
+.tag-own{background:rgba(201,162,39,.15);color:var(--gold2)}
+/* PRICE */
+.prow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.prow:last-child{border:none}
+/* BMC */
+.bmc-grid{display:grid;grid-template-columns:1.1fr 1fr 1.3fr 1fr 1.1fr;gap:8px;margin-bottom:8px}
+.bmc-cell{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;position:relative;overflow:hidden;min-height:155px;transition:all .22s}
+.bmc-cell:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(0,0,0,.3)}
+.bmc-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--bc,var(--gold))}
+.bmc-lbl{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--bc,var(--gold));margin-bottom:8px}
+.bmc-txt{font-size:10px;color:var(--text2);line-height:1.65}
+.bmc-tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:600;margin:2px 2px 0 0;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.06);color:var(--text2);border:1px solid rgba(255,255,255,.08)}
+/* VISION */
+.vis-hero{background:linear-gradient(135deg,rgba(201,162,39,.12),rgba(58,142,246,.08));border:1px solid rgba(201,162,39,.3);border-radius:12px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden}
+.vis-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--purple),var(--teal),var(--green))}
+/* 4 AREAS SISTEMICAS */
+.areas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.area-card{border-radius:10px;padding:14px;border:1px solid;position:relative;overflow:hidden;transition:all .22s}
+.area-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac)}
+.area-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.area-ico{font-size:22px;margin-bottom:7px}
+.area-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:5px}
+.area-desc{font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.area-item{display:flex;align-items:flex-start;gap:5px;font-size:10px;color:var(--text2);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.45}
+.area-item:last-child{border:none}
+.area-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.area-meta{margin-top:8px;padding:7px 9px;background:rgba(0,0,0,.2);border-radius:5px;font-size:10px;line-height:1.5}
+/* CULTURA */
+.cultura-panel{background:linear-gradient(135deg,rgba(58,142,246,.08),rgba(156,111,222,.06));border:1px solid rgba(58,142,246,.25);border-radius:12px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.cultura-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.cultura-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.cultura-item{background:rgba(0,0,0,.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,.05)}
+.cultura-item-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:5px}
+.cultura-item-desc{font-size:10px;color:var(--text2);line-height:1.65}
+/* VALORES */
+.valor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.valor-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;border-top:3px solid var(--vc,var(--gold))}
+.valor-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:4px}
+.valor-desc{font-size:10px;color:var(--text2);line-height:1.6}
+/* ORG */
+.org-row{display:flex;justify-content:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.org-box{padding:9px 14px;border-radius:7px;font-size:11px;font-weight:500;text-align:center;min-width:130px;border:1px solid transparent}
+/* FUENTES */
+.src-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.src-card{background:var(--bg3);border:1px solid var(--border);border-top:3px solid var(--sc,var(--teal));border-radius:10px;padding:13px}
+.src-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:2px}
+.src-type{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:7px}
+.src-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:600;font-family:'JetBrains Mono',monospace;margin-bottom:7px;border:1px solid}
+.src-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px}
+.src-row:last-child{border:none}
+.src-k{color:var(--text3)} .src-v{font-family:'JetBrains Mono',monospace}
+.src-live{margin-top:7px;padding:6px 8px;background:rgba(0,0,0,.2);border-radius:5px;font-size:10px;font-family:'JetBrains Mono',monospace;min-height:22px}
+/* INSIGHTS */
+.ins-card{background:var(--bg3);border:1px solid rgba(58,142,246,.3);border-radius:10px;padding:16px;margin-bottom:12px}
+.ins-card.gold{border-color:rgba(201,162,39,.3)}
+.ins-txt{font-size:12px;color:var(--text2);line-height:1.75;min-height:48px}
+.ins-btn{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:6px 13px;border-radius:5px;background:rgba(58,142,246,.12);border:1px solid rgba(58,142,246,.3);color:var(--blue);font-size:11px;cursor:pointer;transition:all .2s}
+.ins-btn:hover{background:rgba(58,142,246,.22)}
+.ins-btn.gold{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.3);color:var(--gold2)}
+.ld{display:none;gap:4px;align-items:center;padding:6px 0}
+.ldd{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:bounce 1.1s infinite}
+.ldd:nth-child(2){animation-delay:.2s}.ldd:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+/* API KEY */
+.apk-panel{background:var(--bg3);border:1px solid rgba(58,142,246,.4);border-top:3px solid var(--blue);border-radius:10px;padding:14px;margin-bottom:14px}
+.apk-inp{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none}
+.apk-status{display:flex;align-items:center;gap:7px;font-size:11px;margin-top:8px;padding:7px 11px;border-radius:6px}
+.apk-status.ok{background:rgba(0,200,160,.1);color:var(--teal);border:1px solid rgba(0,200,160,.2)}
+.apk-status.empty{background:rgba(240,90,90,.08);color:var(--red);border:1px solid rgba(240,90,90,.2)}
+/* SEASON CAL */
+.sea-grid{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
+.sea-month{flex:1;min-width:38px;text-align:center;padding:6px 2px;border-radius:5px;font-size:9px;border:1px solid}
+/* QHIST */
+.qhist-item{display:flex;justify-content:space-between;padding:7px;background:var(--bg4);border-radius:5px;border:1px solid var(--border);font-size:10px;margin-bottom:5px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+/* CHART WRAPPER */
+.chw{position:relative;width:100%}
+/* SPIN */
+.spin{display:inline-block;animation:rotar .7s linear infinite}
+@keyframes rotar{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-ic">🍇</div>
+    <div>
+      <div class="logo-tx">Empresa Autónoma · Moscatel Perú</div>
+      <div class="logo-sub">8 Agentes IA · Sistema Autónomo · Piura / Ica</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="api-badge">⚡ APIs reales activas</div>
+    <div class="live-b"><div class="live-d"></div>EN VIVO</div>
+    <div class="clk" id="clockEl">--:--:--</div>
+    <div style="font-size:10px;color:var(--text3)">Perú · UTC-5</div>
+  </div>
+</div>
+
+<!-- TABS — 6 secciones, sin redundancia -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)">📊 Resumen</div>
+  <div class="tab" onclick="switchTab(1)">🤖 8 Agentes IA</div>
+  <div class="tab" onclick="switchTab(2)">🌍 Mercados</div>
+  <div class="tab" onclick="switchTab(3)">🔮 Inteligencia IA</div>
+  <div class="tab" onclick="switchTab(4)">🧩 Canvas BMC</div>
+  <div class="tab" onclick="switchTab(5)">🎯 Visión & Cultura</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 0 — RESUMEN
+══════════════════════════════════════════════ -->
+<div class="main active" id="tab0" style="display:block">
+
+  <!-- FILTROS -->
+  <div class="fbar">
+    <span class="flbl">Campaña:</span>
+    <button class="fbtn active" id="btn-2025" onclick="setCampaign('2025')">2025</button>
+    <button class="fbtn" id="btn-2026" onclick="setCampaign('2026')">2026 Proy.</button>
+    <span class="flbl" style="margin-left:8px">Variedad:</span>
+    <button class="fbtn active" id="btn-mosc" onclick="setVariety('moscatel')">Moscatel</button>
+    <button class="fbtn" id="btn-all" onclick="setVariety('todo')">Todo portafolio</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3)">
+      <span style="display:flex;align-items:center;gap:3px"><span class="api-dot dot-ok" id="dot-wx"></span>Clima real</span>
+      <span style="display:flex;align-items:center;gap:3px"><span class="api-dot dot-ok" id="dot-fx"></span>Divisas real</span>
+      <span style="display:flex;align-items:center;gap:3px"><span class="api-dot dot-off" id="dot-pr"></span>Precios ref.</span>
+      <span>Actualizado: <span id="lastUp">--</span></span>
+    </div>
+  </div>
+
+  <!-- BANNER CAMPAÑA -->
+  <div id="campaignBanner" style="padding:7px 14px;border-radius:7px;border:1px solid rgba(0,200,160,.25);background:rgba(0,200,160,.08);color:var(--teal);font-size:11px;font-weight:500;margin-bottom:13px;transition:all .4s">
+    📊 Campaña 2025 — FOB proyectado US$8.4M · Portafolio: Uva Moscatel
+  </div>
+
+  <!-- API BAR -->
+  <div class="api-bar">
+    <span style="font-size:10px;font-weight:600;color:var(--text2);margin-right:4px">FUENTES ACTIVAS:</span>
+    <span style="display:flex;align-items:center;gap:4px"><span class="api-dot dot-ok" id="sb-wx"></span>Open-Meteo Piura/Ica</span>
+    <span style="display:flex;align-items:center;gap:4px"><span class="api-dot dot-ok" id="sb-fx"></span>ExchangeRate-API</span>
+    <span style="display:flex;align-items:center;gap:4px"><span class="api-dot dot-ok"></span>BCRP TC oficial</span>
+    <span style="display:flex;align-items:center;gap:4px"><span class="api-dot dot-warn"></span>Agronometrics (pendiente)</span>
+    <span style="display:flex;align-items:center;gap:4px"><span class="api-dot dot-off"></span>Tive IoT (pendiente hardware)</span>
+    <div style="margin-left:auto;font-size:10px;color:var(--text3)">Costo APIs activas: <span style="color:var(--teal);font-weight:600">US$0/mes</span></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kgrid">
+    <div class="kcard" style="--accent:var(--gold)">
+      <div class="kico">💰</div><div class="klbl">FOB proyectado</div>
+      <div class="kval" id="k0">US$ --M</div>
+      <div class="ksub">+29% margen neto/cont.</div>
+      <span class="kbadge sim">Ref. interna</span>
+    </div>
+    <div class="kcard" style="--accent:var(--teal)">
+      <div class="kico">📦</div><div class="klbl">Contenedores activos</div>
+      <div class="kval" id="k1">--</div>
+      <div class="ksub">Campaña en curso</div>
+      <span class="kbadge sim">Ref. interna</span>
+    </div>
+    <div class="kcard" style="--accent:var(--blue)">
+      <div class="kico">🌡</div><div class="klbl">Temp. Piura ahora</div>
+      <div class="kval" id="k2">--°C</div>
+      <div class="ksub" id="k2sub">Cargando datos reales...</div>
+      <span class="kbadge real">Open-Meteo REAL</span>
+    </div>
+    <div class="kcard" style="--accent:var(--purple)">
+      <div class="kico">💱</div><div class="klbl">USD/PEN hoy</div>
+      <div class="kval" id="k3">-- PEN</div>
+      <div class="ksub" id="k3sub">Cargando...</div>
+      <span class="kbadge real">ExchangeRate REAL</span>
+    </div>
+    <div class="kcard" style="--accent:var(--red)">
+      <div class="kico">🚀</div><div class="klbl">ROI sistema IA</div>
+      <div class="kval" id="k4">+400%</div>
+      <div class="ksub">Costo: US$200/mes · 8 agentes</div>
+      <span class="kbadge sim">Proyectado</span>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Exportaciones mensuales TM & FOB <span class="cbadge sim">REF.</span></div>
+      <div class="chw" style="height:210px"><canvas id="exportChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Distribución mercados destino</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="chw" style="height:185px;width:185px;flex-shrink:0"><canvas id="mktChart"></canvas></div>
+        <div id="mktLeg" style="flex:1;display:flex;flex-direction:column;gap:7px;font-size:11px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ctitle">Temp. Piura vs Ica — 7 días <span class="cbadge">REAL</span></div>
+      <div class="chw" style="height:180px"><canvas id="wxChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">USD/PEN en tiempo real <span class="cbadge">REAL</span></div>
+      <div class="chw" style="height:180px"><canvas id="fxChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Reducción pérdidas postcosecha <span class="cbadge sim">REF.</span></div>
+      <div class="chw" style="height:180px"><canvas id="lossChart"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 — 8 AGENTES IA (unificado, sin redundancia)
+══════════════════════════════════════════════ -->
+<div class="main" id="tab1" style="display:none">
+
+  <!-- GOOGLE SHEETS CONNECTOR -->
+  <div class="sheet-panel">
+    <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:7px">
+      📊 Conectar Google Sheets — Datos reales de tus agentes n8n
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:9px">
+      Pega el ID de tu Sheet "Moscatel-Dashboard" para ver datos reales. Primero hazlo público: Compartir → Cualquiera con el enlace → Lector.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input class="sheet-inp" id="sheetIdInp" type="text" placeholder="Pega aquí el ID de tu Google Sheet (entre /d/ y /edit en la URL)"/>
+      <button class="sbtn sbtn-g" onclick="saveSheetId()">💾 Guardar ID</button>
+      <button class="sbtn sbtn-t" onclick="loadSheetData()"><span id="loadSpin">↻</span> Cargar datos ahora</button>
+    </div>
+    <div id="sheetStatus" style="margin-top:7px;font-size:11px;color:var(--text3)">
+      💡 Los datos de tus 4 agentes activos aparecerán automáticamente en las tarjetas abajo
+    </div>
+  </div>
+
+  <!-- ORQUESTADOR HERO -->
+  <div class="orch-panel">
+    <div class="orch-head">
+      <div class="orch-icon">🤖</div>
+      <div>
+        <div class="orch-name">Agente Orquestador — Cerebro Central</div>
+        <div class="orch-role">Coordina los 7 agentes · Cruza información · Emite briefing diario 6:30 AM · Motor: Claude AI</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div class="live-b"><div class="live-d"></div>ACTIVO</div>
+        <div style="font-size:10px;color:var(--text2)">Último briefing: <span id="orchLastTime" style="color:var(--gold2);font-family:'JetBrains Mono',monospace">--:--</span></div>
+      </div>
+    </div>
+    <div class="orch-metrics">
+      <div class="orch-m"><div class="orch-ml">Agentes coordinados</div><div class="orch-mv" id="om1">4 / 8</div></div>
+      <div class="orch-m"><div class="orch-ml">Nivel global</div><div class="orch-mv" id="om2" style="color:var(--teal)">--</div></div>
+      <div class="orch-m"><div class="orch-ml">Alerta crítica</div><div class="orch-mv" id="om3">--</div></div>
+      <div class="orch-m"><div class="orch-ml">Última ejecución</div><div class="orch-mv" id="om4">--</div></div>
+    </div>
+    <div class="orch-decision" id="orchDecision">⟳ Carga tu Google Sheet arriba para ver el briefing real del Orquestador...</div>
+  </div>
+
+  <!-- 8 AGENTES — FILA 1 (4 activos con datos Sheets) -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Los 8 Agentes IA</div>
+    <div style="font-size:10px;color:var(--text2)">🟢 Activo con datos reales · 🟡 Activo simulado · ⚫ En desarrollo</div>
+  </div>
+
+  <div class="a8grid">
+
+    <!-- AG 1: CLIMÁTICO -->
+    <div class="agcard" style="--ac:var(--blue)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(58,142,246,.15)">🌤</div>
+        <div><div class="agname">Climático</div><div class="agrole">Piura · Ica · Riesgo campo</div></div>
+      </div>
+      <div class="agpill ok"><span class="sdot" style="background:var(--teal)"></span>🟢 ACTIVO · Datos reales</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Nivel de riesgo</span><span class="agmv ok" id="ag-cl-nivel">--</span></div>
+        <div class="agmrow"><span class="agmk">Temp. Piura</span><span class="agmv" id="ag-cl-piura">-- °C</span></div>
+        <div class="agmrow"><span class="agmk">Humedad Piura</span><span class="agmv" id="ag-cl-hum">-- %</span></div>
+        <div class="agmrow"><span class="agmk">Ventana cosecha</span><span class="agmv ok" id="ag-cl-ventana">--</span></div>
+      </div>
+      <div class="agbrief" id="ag-cl-brief">⟳ Conecta Sheets para ver resumen real</div>
+      <div class="agsrc">📡 Open-Meteo · SENAMHI · Dashboard_Climatico</div>
+      <div style="font-size:8px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace">Últ. ejec: <span id="ag-cl-hora">--</span></div>
+    </div>
+
+    <!-- AG 2: COMERCIAL -->
+    <div class="agcard" style="--ac:var(--gold)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(201,162,39,.15)">💰</div>
+        <div><div class="agname">Comercial</div><div class="agrole">Precio · Tipo cambio · Decisión</div></div>
+      </div>
+      <div class="agpill ok"><span class="sdot" style="background:var(--teal)"></span>🟢 ACTIVO · Datos reales</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Semáforo</span><span class="agmv ok" id="ag-co-semaforo">--</span></div>
+        <div class="agmrow"><span class="agmk">USD/PEN</span><span class="agmv" id="ag-co-pen">--</span></div>
+        <div class="agmrow"><span class="agmk">Precio Moscatel</span><span class="agmv" id="ag-co-precio">--/kg</span></div>
+        <div class="agmrow"><span class="agmk">Decisión</span><span class="agmv" id="ag-co-decision">--</span></div>
+      </div>
+      <div class="agbrief" id="ag-co-brief">⟳ Conecta Sheets para ver resumen real</div>
+      <div class="agsrc">📡 ExchangeRate · BCRP · Dashboard_Comercial</div>
+      <div style="font-size:8px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace">Últ. ejec: <span id="ag-co-hora">--</span></div>
+    </div>
+
+    <!-- AG 3: ADUANAS -->
+    <div class="agcard" style="--ac:var(--orange)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(240,144,64,.15)">🛃</div>
+        <div><div class="agname">Aduanas</div><div class="agrole">DUAs · Documentos · SUNAT</div></div>
+      </div>
+      <div class="agpill sim"><span class="sdot" style="background:var(--orange)"></span>🟡 ACTIVO · Simulado (RUC pendiente)</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Nivel alerta</span><span class="agmv" id="ag-ad-nivel">--</span></div>
+        <div class="agmrow"><span class="agmk">Docs faltantes</span><span class="agmv warn" id="ag-ad-docs">--</span></div>
+        <div class="agmrow"><span class="agmk">Riesgo embarque</span><span class="agmv" id="ag-ad-riesgo">--</span></div>
+        <div class="agmrow"><span class="agmk">Valor exportación</span><span class="agmv" id="ag-ad-valor">--</span></div>
+      </div>
+      <div class="agbrief" id="ag-ad-brief">⟳ Conecta Sheets para ver resumen real</div>
+      <div class="agsrc">📡 SUNAT · Checklist DUAs · Dashboard_Aduanas</div>
+      <div style="font-size:8px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace">Últ. ejec: <span id="ag-ad-hora">--</span></div>
+    </div>
+
+    <!-- AG 4: ORQUESTADOR (tarjeta) -->
+    <div class="agcard" style="--ac:var(--purple)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(156,111,222,.15)">🧠</div>
+        <div><div class="agname">Orquestador</div><div class="agrole">Síntesis · Briefing CEO · Claude AI</div></div>
+      </div>
+      <div class="agpill ok"><span class="sdot" style="background:var(--teal)"></span>🟢 ACTIVO · Datos reales</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Nivel global</span><span class="agmv ok" id="ag-or-nivel">--</span></div>
+        <div class="agmrow"><span class="agmk">Estado Climático</span><span class="agmv" id="ag-or-clima">--</span></div>
+        <div class="agmrow"><span class="agmk">Estado Comercial</span><span class="agmv" id="ag-or-com">--</span></div>
+        <div class="agmrow"><span class="agmk">Decisión del día</span><span class="agmv" id="ag-or-decision" style="font-size:9px;text-align:right;max-width:110px">--</span></div>
+      </div>
+      <div class="agbrief" id="ag-or-brief">⟳ Conecta Sheets para ver briefing real</div>
+      <div class="agsrc">📡 Claude API · 3 agentes · Dashboard_Central</div>
+      <div style="font-size:8px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace">Últ. ejec: <span id="ag-or-hora">--</span></div>
+    </div>
+
+  </div>
+
+  <!-- 8 AGENTES — FILA 2 (4 en desarrollo) -->
+  <div class="a8grid">
+
+    <!-- AG 5: MERCADO -->
+    <div class="agcard" style="--ac:var(--purple)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(156,111,222,.15)">📈</div>
+        <div><div class="agname">Mercado</div><div class="agrole">Competidores · Demanda · FOB</div></div>
+      </div>
+      <div class="agpill dev"><span class="sdot" style="background:var(--text3)"></span>⚫ En desarrollo · Semana 4</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Precio USA ref.</span><span class="agmv">$1.85/kg</span></div>
+        <div class="agmrow"><span class="agmk">Precio Europa ref.</span><span class="agmv">$1.65/kg</span></div>
+        <div class="agmrow"><span class="agmk">Competidores</span><span class="agmv">Chile · Sudáfrica</span></div>
+        <div class="agmrow"><span class="agmk">Pendiente</span><span class="agmv warn">Veritrade $80/mes</span></div>
+      </div>
+      <div class="agbrief">Requiere Veritrade + TradeMap para datos reales de volumen importación</div>
+      <div class="agsrc">📡 Veritrade · TradeMap (pendiente suscripción)</div>
+    </div>
+
+    <!-- AG 6: CALIDAD -->
+    <div class="agcard" style="--ac:var(--green)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(61,184,122,.15)">🍇</div>
+        <div><div class="agname">Calidad</div><div class="agrole">Brix · Firmeza · SENASA</div></div>
+      </div>
+      <div class="agpill dev"><span class="sdot" style="background:var(--text3)"></span>⚫ En desarrollo · Semana 6</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Brix objetivo</span><span class="agmv">18–22°</span></div>
+        <div class="agmrow"><span class="agmk">Firmeza objetivo</span><span class="agmv">&gt;14 N/cm²</span></div>
+        <div class="agmrow"><span class="agmk">Sensor requerido</span><span class="agmv warn">Refractómetro BT</span></div>
+        <div class="agmrow"><span class="agmk">Certificación</span><span class="agmv">SENASA SIVEP</span></div>
+      </div>
+      <div class="agbrief">Requiere sensor IoT en campo. Cuando active: score calidad 0-100 en tiempo real</div>
+      <div class="agsrc">📡 Sensores IoT · SENASA SIVEP (pendiente hardware)</div>
+    </div>
+
+    <!-- AG 7: LOGÍSTICO — ACTIVO ESP32 -->
+    <div class="agcard" style="--ac:var(--teal)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(0,200,160,.15)">🚢</div>
+        <div><div class="agname">Logístico</div><div class="agrole">ESP32 · Contenedor · Temperatura</div></div>
+      </div>
+      <div class="agpill ok"><span class="sdot" style="background:var(--teal)"></span>🟢 ACTIVO · Datos reales</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Nivel alerta</span><span class="agmv ok" id="ag-lg-nivel">--</span></div>
+        <div class="agmrow"><span class="agmk">Temperatura ESP32</span><span class="agmv" id="ag-lg-temp">--</span></div>
+        <div class="agmrow"><span class="agmk">Brix</span><span class="agmv" id="ag-lg-brix">--</span></div>
+        <div class="agmrow"><span class="agmk">Riesgo carga</span><span class="agmv" id="ag-lg-riesgo">--</span></div>
+      </div>
+      <div class="agbrief" id="ag-lg-brief">⟳ Conecta Sheets para ver datos reales del ESP32</div>
+      <div class="agsrc">📡 ESP32 · Google Sheets · Dashboard_Logistico &nbsp;&nbsp;Últ. ejec: <span id="ag-lg-hora">--</span></div>
+      <div style="margin-top:4px;font-size:8px;font-family:'JetBrains Mono',monospace">
+        Lote: <span id="ag-lg-lote" style="color:var(--teal)">--</span>
+        &nbsp;·&nbsp; Estado: <span id="ag-lg-estado" style="color:var(--text2)">--</span>
+        &nbsp;·&nbsp; <span id="ag-lg-modo" style="color:var(--teal)">--</span>
+      </div>
+    </div>
+
+    <!-- AG 8: FINANCIERO -->
+    <div class="agcard" style="--ac:var(--red)">
+      <div class="aghead">
+        <div class="agico" style="background:rgba(240,90,90,.15)">📊</div>
+        <div><div class="agname">Financiero</div><div class="agrole">Margen · FX · ROI</div></div>
+      </div>
+      <div class="agpill dev"><span class="sdot" style="background:var(--text3)"></span>⚫ En desarrollo · Semana 7</div>
+      <div class="agm">
+        <div class="agmrow"><span class="agmk">Margen obj./cont.</span><span class="agmv">US$8,000+</span></div>
+        <div class="agmrow"><span class="agmk">ROI sistema IA</span><span class="agmv ok">+400%</span></div>
+        <div class="agmrow"><span class="agmk">Costo operativo</span><span class="agmv">~$269/mes</span></div>
+        <div class="agmrow"><span class="agmk">FX real</span><span class="agmv" id="ag-fi-fx">-- PEN</span></div>
+      </div>
+      <div class="agbrief">Integra P&L real por contenedor + cobertura cambiaria con datos BCRP</div>
+      <div class="agsrc">📡 BCRP · ExchangeRate · Google Sheets (pendiente)</div>
+    </div>
+
+  </div>
+
+  <!-- CHART ACTIVIDAD -->
+  <div class="card">
+    <div class="ctitle">Actividad de los 8 agentes — últimas 24h <span class="cbadge sim">SIMULADO</span></div>
+    <div class="chw" style="height:200px"><canvas id="agActChart"></canvas></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 — MERCADOS (integra tab Mercados + Competidores)
+══════════════════════════════════════════════ -->
+<div class="main" id="tab2" style="display:none">
+
+  <div class="fbar">
+    <span class="flbl">Campaña:</span>
+    <button class="fbtn active" id="btn-2025b" onclick="setCampaign('2025')">2025</button>
+    <button class="fbtn" id="btn-2026b" onclick="setCampaign('2026')">2026 Proy.</button>
+    <span class="flbl" style="margin-left:8px">Variedad:</span>
+    <button class="fbtn active" id="btn-moscb" onclick="setVariety('moscatel')">Moscatel</button>
+    <button class="fbtn" id="btn-allb" onclick="setVariety('todo')">Todo portafolio</button>
+  </div>
+
+  <!-- PRECIOS POR MERCADO -->
+  <div class="g4 mb">
+    <div class="kcard" style="--accent:var(--blue)"><div class="kico">🇺🇸</div><div class="klbl">EE.UU. (51%)</div><div class="kval" id="mp0">US$ --/kg</div><div class="ksub">Los Ángeles · Costa Este</div><span class="kbadge sim">Ref.</span></div>
+    <div class="kcard" style="--accent:var(--purple)"><div class="kico">🇪🇺</div><div class="klbl">Europa (31%)</div><div class="kval" id="mp1">US$ --/kg</div><div class="ksub">Rotterdam · Barcelona</div><span class="kbadge sim">Ref.</span></div>
+    <div class="kcard" style="--accent:var(--teal)"><div class="kico">🌏</div><div class="klbl">Asia (11%)</div><div class="kval" id="mp2">US$ --/kg</div><div class="ksub">Hong Kong · Shanghái</div><span class="kbadge sim">Ref.</span></div>
+    <div class="kcard" style="--accent:var(--gold)"><div class="kico">📊</div><div class="klbl">Promedio ponderado</div><div class="kval" id="mp3">US$ --/kg</div><div class="ksub" id="mp3s">En PEN: -- /kg</div><span class="kbadge real">FX REAL</span></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Evolución precios Moscatel — 16 semanas <span class="cbadge sim">REF.</span></div>
+      <div class="chw" style="height:210px"><canvas id="priceLine"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Tipos de cambio en tiempo real <span class="cbadge">REAL · ExchangeRate-API</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+        <div style="text-align:center;padding:10px;background:var(--bg4);border-radius:7px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">USD → PEN</div><div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold2)" id="fx-pen">--</div></div>
+        <div style="text-align:center;padding:10px;background:var(--bg4);border-radius:7px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">USD → EUR</div><div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--purple)" id="fx-eur">--</div></div>
+        <div style="text-align:center;padding:10px;background:var(--bg4);border-radius:7px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">USD → GBP</div><div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--green)" id="fx-gbp">--</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3)">Fuente: open.er-api.com · Actualización cada 30 min · Última: <span id="fx-time" style="color:var(--teal)">--</span></div>
+      <div class="chw" style="height:120px;margin-top:10px"><canvas id="fxChartMkt"></canvas></div>
+    </div>
+  </div>
+
+  <!-- COMPETIDORES -->
+  <div class="card mb">
+    <div class="ctitle">Análisis competitivo — 6 empresas clave <span class="cbadge gold">BENCHMARK</span></div>
+    <table class="ctbl"><thead><tr>
+      <th>#</th><th>Empresa</th><th>Tipo</th><th>FOB</th><th>% IA</th><th>Propuesta de valor</th><th>Score éxito</th><th>Riesgo</th>
+    </tr></thead><tbody id="compTbody"></tbody></table>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">FOB exportaciones (US$ M) <span class="cbadge sim">REF.</span></div>
+      <div class="chw" style="height:220px"><canvas id="compBar"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Posicionamiento IA vs Éxito <span class="cbadge sim">REF.</span></div>
+      <div class="chw" style="height:220px"><canvas id="compScat"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div class="card">
+    <div class="ctitle">Calendario de campaña — Moscatel Perú</div>
+    <div id="seaCal" style="margin-top:6px"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 — INTELIGENCIA IA
+══════════════════════════════════════════════ -->
+<div class="main" id="tab3" style="display:none">
+
+  <div class="apk-panel" id="apkPanel">
+    <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px">🔑 API Key Claude — Análisis de IA en tiempo real</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Ingresa tu API Key de Anthropic para activar los análisis estratégicos con datos reales de hoy.</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input class="apk-inp" id="apkInp" type="password" placeholder="sk-ant-api03-..." style="flex:1;min-width:200px"/>
+      <button class="sbtn sbtn-t" onclick="saveKey()">💾 Guardar key</button>
+      <button class="sbtn" style="background:rgba(240,90,90,.1);color:var(--red);border:1px solid rgba(240,90,90,.3)" onclick="clearKey()">🗑 Borrar</button>
+    </div>
+    <div class="apk-status empty" id="apkStatus"><span id="apkIcon">⚠</span><span id="apkTxt">Ingresa tu API Key para activar los análisis IA.</span></div>
+  </div>
+
+  <div class="ins-card gold">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+      <div style="font-size:16px">🎯</div>
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Análisis estratégico de mercado con datos reales</div>
+      <div style="margin-left:auto;background:rgba(58,142,246,.15);border:1px solid rgba(58,142,246,.3);padding:3px 9px;border-radius:4px;font-size:10px;color:var(--blue);font-weight:700;font-family:'JetBrains Mono',monospace">✦ CLAUDE AI</div>
+    </div>
+    <div class="ins-txt" id="it0">Haz clic en "Generar análisis" para obtener una evaluación estratégica del mercado Moscatel con precio real FX de hoy.</div>
+    <div class="ld" id="ld0"><div class="ldd"></div><div class="ldd"></div><div class="ldd"></div><span style="font-size:11px;color:var(--text3);margin-left:6px">Claude analizando con datos reales...</span></div>
+    <button class="ins-btn gold" onclick="fetchInsight(0)">✦ Generar análisis de mercado</button>
+    <button class="ins-btn gold" onclick="fetchInsight(1)" style="margin-left:8px">✦ Tendencias precio Moscatel</button>
+  </div>
+
+  <div class="ins-card">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+      <div style="font-size:16px">🏆</div>
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Ventajas competitivas y estrategia IA</div>
+      <div style="margin-left:auto;background:rgba(58,142,246,.15);border:1px solid rgba(58,142,246,.3);padding:3px 9px;border-radius:4px;font-size:10px;color:var(--blue);font-weight:700;font-family:'JetBrains Mono',monospace">✦ CLAUDE AI</div>
+    </div>
+    <div class="ins-txt" id="it1">Haz clic para analizar cómo tus 8 agentes IA te posicionan frente a Rapel, El Pedregal, Ecosac, Burnt y HyperCept.</div>
+    <div class="ld" id="ld1"><div class="ldd"></div><div class="ldd"></div><div class="ldd"></div><span style="font-size:11px;color:var(--text3);margin-left:6px">Claude analizando...</span></div>
+    <button class="ins-btn" onclick="fetchInsight(2)">✦ Analizar ventajas vs competidores</button>
+    <button class="ins-btn" onclick="fetchInsight(3)" style="margin-left:8px">✦ Estrategia ROI sistema IA</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Historial de consultas IA esta sesión</div>
+    <div id="qHist"><div style="color:var(--text3);font-size:11px;padding:7px">Sin consultas en esta sesión.</div></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4 — CANVAS BMC
+══════════════════════════════════════════════ -->
+<div class="main" id="tab4" style="display:none">
+
+  <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px">Business Model Canvas — Empresa Autónoma Moscatel</div>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:14px">Modelo de negocio con 8 agentes IA integrados · Valores en tiempo real donde aplica</div>
+
+  <div class="bmc-grid">
+    <div class="bmc-cell" style="--bc:var(--blue)">
+      <div class="bmc-lbl">🤝 Socios Clave</div>
+      <div class="bmc-txt">Navieras (Maersk, Hapag-Lloyd)<br>SENASA Perú<br>Importadores EE.UU. y Europa<br>Proveedores sensores Tive<br>SUNAT / MINCETUR<br>Agentes de aduanas Callao</div>
+    </div>
+    <div class="bmc-cell" style="--bc:var(--orange)">
+      <div class="bmc-lbl">⚙ Actividades Clave</div>
+      <div class="bmc-txt">Cultivo Moscatel Piura/Ica<br>Exportación FOB Callao<br>Gestión 8 agentes IA<br>Control calidad y brix<br>Logística refrigerada 0–2°C<br>Análisis mercados internacionales</div>
+    </div>
+    <div class="bmc-cell" style="--bc:var(--gold)">
+      <div class="bmc-lbl">💎 Propuesta de Valor</div>
+      <div class="bmc-txt">Uva Moscatel premium con IA integrada. Trazabilidad total, 30% menos pérdidas, decisiones autónomas 24/7.<br><br>
+      <strong style="color:var(--gold2)">Precio FOB actual:</strong> <span id="bmc-pusa">US$ --/kg</span><br>
+      <strong style="color:var(--teal)">USD/PEN real:</strong> <span id="bmc-pen">S/. --</span><br>
+      <strong style="color:var(--purple)">FOB proyectado:</strong> <span id="bmc-fob">US$ --M</span></div>
+    </div>
+    <div class="bmc-cell" style="--bc:var(--purple)">
+      <div class="bmc-lbl">💬 Relación Clientes</div>
+      <div class="bmc-txt">Contratos anuales FOB<br>Reportes calidad automatizados<br>Trazabilidad en tiempo real<br>Soporte Agente Comercial 24/7<br>Comunicación directa CEO-importador</div>
+    </div>
+    <div class="bmc-cell" style="--bc:var(--teal)">
+      <div class="bmc-lbl">👥 Segmentos</div>
+      <div class="bmc-txt">Importadores EE.UU. (51%)<br>Distribuidores Europa (31%)<br>Cadenas Asia (11%)<br>Premium retail (7%)<br>Potencial SaaS AgriTech (2027)</div>
+    </div>
+  </div>
+  <div class="bmc-grid">
+    <div class="bmc-cell" style="--bc:var(--green);min-height:110px">
+      <div class="bmc-lbl">🏗 Recursos Clave</div>
+      <div class="bmc-txt">Campos Piura e Ica<br>8 Agentes IA (Claude)<br>Cadena de frío certificada<br>Red compradores internacionales<br>Know-how Moscatel premium</div>
+    </div>
+    <div></div><div></div><div></div>
+    <div class="bmc-cell" style="--bc:var(--blue);min-height:110px">
+      <div class="bmc-lbl">📢 Canales</div>
+      <div class="bmc-txt">Exportación directa FOB<br>Ferias internacionales (PMA)<br>Portal B2B digital<br>Agente Comercial IA 24/7</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="bmc-cell" style="--bc:var(--red);min-height:90px">
+      <div class="bmc-lbl">💸 Estructura de Costos</div>
+      <div class="bmc-txt">Sistema IA: US$269/mes (8 agentes completos) · Campo y cosecha: principal costo variable · Flete refrigerado Callao-destino · Certificaciones SENASA · Agentes de aduanas</div>
+    </div>
+    <div class="bmc-cell" style="--bc:var(--teal);min-height:90px">
+      <div class="bmc-lbl">💰 Fuentes de Ingreso</div>
+      <div class="bmc-txt">FOB Moscatel premium: <strong id="bmc-fob2" style="color:var(--teal)">US$ --M</strong> · Premium calidad IA: +$0.40-0.80/kg (cert. ESG Europa) · SaaS AgriTech (2027): licenciar sistema IA a otras exportadoras</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 5 — VISIÓN & CULTURA (nuevo, unificado)
+══════════════════════════════════════════════ -->
+<div class="main" id="tab5" style="display:none">
+
+  <!-- VISIÓN HERO -->
+  <div class="vis-hero">
+    <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px">VISIÓN ESTRATÉGICA 2025–2028</div>
+    <div style="font-family:'Syne',sans-serif;font-size:21px;font-weight:800;line-height:1.3;margin-bottom:7px">Ser la primera exportadora autónoma de uva Moscatel del Perú, reconocida por la calidad de su producto y la innovación de su sistema de gestión con IA.</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.75;max-width:820px">Una empresa donde los agentes IA trabajan 24/7 para proteger la cosecha, optimizar el precio, garantizar la trazabilidad y liberar al CEO para enfocarse en relaciones estratégicas y expansión al mercado SaaS.</div>
+  </div>
+
+  <!-- MISIÓN + VALORES -->
+  <div class="g2 mb">
+    <div class="card">
+      <div class="ctitle" style="font-size:13px;font-weight:700;color:var(--text);text-transform:none;letter-spacing:0">🎯 Misión</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.75">Exportar uva Moscatel premium del Perú a mercados de alto valor, utilizando un sistema de 8 agentes IA que garantiza decisiones oportunas, calidad consistente y rentabilidad sostenida — generando beneficio real para el territorio de Piura e Ica.</div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="font-size:13px;font-weight:700;color:var(--text);text-transform:none;letter-spacing:0">⭐ Valores</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="background:var(--bg4);border-radius:6px;padding:8px;border-left:2px solid var(--gold)"><div style="font-size:10px;font-weight:700;color:var(--gold2)">Excelencia</div><div style="font-size:9px;color:var(--text3)">Calidad en cada racimo exportado</div></div>
+        <div style="background:var(--bg4);border-radius:6px;padding:8px;border-left:2px solid var(--teal)"><div style="font-size:10px;font-weight:700;color:var(--teal)">Innovación</div><div style="font-size:9px;color:var(--text3)">IA aplicada a la agroindustria</div></div>
+        <div style="background:var(--bg4);border-radius:6px;padding:8px;border-left:2px solid var(--blue)"><div style="font-size:10px;font-weight:700;color:var(--blue)">Transparencia</div><div style="font-size:9px;color:var(--text3)">Trazabilidad total al importador</div></div>
+        <div style="background:var(--bg4);border-radius:6px;padding:8px;border-left:2px solid var(--purple)"><div style="font-size:10px;font-weight:700;color:var(--purple)">Territorio</div><div style="font-size:9px;color:var(--text3)">Impacto positivo Piura e Ica</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 ÁREAS SISTÉMICAS -->
+  <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:3px">Metodología Sistémica — Las 4 Áreas Base</div>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:11px">Cada área es un pilar de la empresa potenciado por los agentes IA correspondientes. Juntas forman el sistema que hace posible la operación autónoma.</div>
+
+  <div class="areas-grid">
+
+    <!-- VENTAS & MARKETING -->
+    <div class="area-card" style="--ac:var(--blue);background:rgba(58,142,246,.07);border-color:rgba(58,142,246,.25)">
+      <div class="area-ico">📣</div>
+      <div class="area-name" style="color:var(--blue)">Ventas & Marketing</div>
+      <div class="area-desc">Generación de demanda, posicionamiento de marca y cierre de contratos FOB con importadores internacionales.</div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Agentes IA: <strong style="color:var(--text)">Comercial + Mercado</strong></span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Pipeline de compradores activos</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Precio óptimo por mercado y semana</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Posicionamiento premium Moscatel</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Ferias PMA, Fruit Logistica</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--blue)"></div><span>Certificaciones ESG Europa (+$0.60/kg)</span></div>
+      <div class="area-meta" style="color:var(--blue)">🎯 Meta 2025: US$8.4M FOB · 3 mercados activos</div>
+    </div>
+
+    <!-- PROCESOS & OPERACIONES -->
+    <div class="area-card" style="--ac:var(--teal);background:rgba(0,200,160,.07);border-color:rgba(0,200,160,.25)">
+      <div class="area-ico">⚙️</div>
+      <div class="area-name" style="color:var(--teal)">Procesos & Operaciones</div>
+      <div class="area-desc">Gestión del ciclo productivo desde el campo hasta la entrega en destino, con trazabilidad total y 0 pérdidas evitables.</div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>Agentes IA: <strong style="color:var(--text)">Climático + Logístico + Calidad</strong></span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>Monitoreo clima Piura/Ica 24/7</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>Control brix y firmeza en campo</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>Tracking contenedor 0–2°C</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>ETA actualizado en tiempo real</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--teal)"></div><span>Reducción pérdidas postcosecha 30%</span></div>
+      <div class="area-meta" style="color:var(--teal)">🎯 Meta 2025: pérdidas &lt;5% · 0 rechazos en destino</div>
+    </div>
+
+    <!-- FINANZAS -->
+    <div class="area-card" style="--ac:var(--gold);background:rgba(201,162,39,.07);border-color:rgba(201,162,39,.25)">
+      <div class="area-ico">💰</div>
+      <div class="area-name" style="color:var(--gold2)">Finanzas</div>
+      <div class="area-desc">Control del margen por contenedor, gestión del riesgo cambiario y monitoreo de la rentabilidad del sistema IA.</div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>Agentes IA: <strong style="color:var(--text)">Financiero + Comercial</strong></span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>USD/PEN en tiempo real (BCRP)</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>Margen neto por contenedor</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>ROI sistema IA: +400%</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>Costo operativo: $269/mes</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--gold)"></div><span>Cobertura cambiaria estratégica</span></div>
+      <div class="area-meta" style="color:var(--gold2)">🎯 Meta 2025: US$8,000+ margen neto/contenedor</div>
+    </div>
+
+    <!-- PERSONAS -->
+    <div class="area-card" style="--ac:var(--purple);background:rgba(156,111,222,.07);border-color:rgba(156,111,222,.25)">
+      <div class="area-ico">👥</div>
+      <div class="area-name" style="color:var(--purple)">Personas</div>
+      <div class="area-desc">El equipo humano que opera el sistema, toma decisiones estratégicas y construye las relaciones que la IA no puede reemplazar.</div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span><strong style="color:var(--text)">CEO:</strong> visión y decisiones estratégicas</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span><strong style="color:var(--text)">Coordinador operativo:</strong> campo y logística</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span><strong style="color:var(--text)">Analista de datos:</strong> dashboard y KPIs</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span><strong style="color:var(--text)">Esp. calidad/comercial:</strong> campo y clientes</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span>Equipo de campo Piura e Ica</span></div>
+      <div class="area-item"><div class="area-dot" style="background:var(--purple)"></div><span>Red de agentes aduanas y carga</span></div>
+      <div class="area-meta" style="color:var(--purple)">🎯 Modelo: 4 personas + 8 agentes IA = empresa completa</div>
+    </div>
+
+  </div>
+
+  <!-- ANÁLISIS DE CULTURA — nuevo, separado -->
+  <div class="cultura-panel">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:3px">🧬 Análisis de Cultura Organizacional</div>
+    <div style="font-size:11px;color:var(--text2)">La cultura es el sistema de valores y comportamientos que hace que las 4 áreas funcionen de forma coherente. Sin ella, los agentes IA son solo tecnología sin dirección estratégica.</div>
+    <div class="cultura-grid">
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--gold2)">🌱 Cultura de datos, no de intuición</div>
+        <div class="cultura-item-desc">En Moscatel, cada decisión importante pasa por datos reales — el briefing del Orquestador a las 6:30 AM, no la corazonada del día. El equipo aprende a leer los reportes de los agentes y actuar sobre ellos. Esto requiere formación continua y confianza en el sistema.</div>
+      </div>
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--teal)">⚡ Cultura de respuesta rápida</div>
+        <div class="cultura-item-desc">Si el Agente Climático manda una alerta roja, el equipo de campo actúa ese mismo día. La IA detecta, el humano ejecuta. Esta velocidad es una ventaja competitiva real frente a empresas que procesan información en reuniones semanales.</div>
+      </div>
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--blue)">🤝 Cultura de confianza sistémica</div>
+        <div class="cultura-item-desc">Los 4 roles humanos no compiten con los agentes IA — los complementan. El coordinador no se siente reemplazado por el Agente Logístico: usa su reporte para tomar mejores decisiones. Narrativa clave: "IA amplifica al humano, no lo sustituye".</div>
+      </div>
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--green)">🌍 Cultura de territorio e impacto</div>
+        <div class="cultura-item-desc">La empresa es de Piura e Ica. El éxito no es solo el FOB — es el bienestar del agricultor, la formalización laboral y el orgullo regional. Esto se traduce en decisiones: no se cambia de proveedor de campo por precio marginal.</div>
+      </div>
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--purple)">📚 Cultura de aprendizaje continuo</div>
+        <div class="cultura-item-desc">Cada ejecución de los agentes genera datos. Cada temporada es un caso de estudio. El equipo revisa los dashboards, identifica patrones y mejora los agentes. Meta 2027: los agentes son más precisos que cualquier consultor externo.</div>
+      </div>
+      <div class="cultura-item">
+        <div class="cultura-item-title" style="color:var(--orange)">🔗 Cómo la cultura sostiene las 4 áreas</div>
+        <div class="cultura-item-desc">
+          <strong style="color:var(--text)">Ventas:</strong> Datos → propuesta creíble con trazabilidad real.<br>
+          <strong style="color:var(--text)">Operaciones:</strong> Respuesta rápida → 0 pérdidas por reacción tardía.<br>
+          <strong style="color:var(--text)">Finanzas:</strong> Confianza sistémica → decisiones sin emociones.<br>
+          <strong style="color:var(--text)">Personas:</strong> Aprendizaje → equipo que evoluciona con la IA.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIGRAMA -->
+  <div class="card mb">
+    <div class="ctitle">Organigrama — Empresa Autónoma Moscatel</div>
+    <div style="text-align:center;padding:8px 0">
+      <div class="org-row">
+        <div class="org-box" style="background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4);color:var(--gold2)">👤 CEO / Líder de Visión</div>
+      </div>
+      <div style="text-align:center;color:var(--text3);margin:3px 0">↓</div>
+      <div class="org-row">
+        <div class="org-box" style="background:rgba(156,111,222,.15);border-color:rgba(156,111,222,.4);color:var(--purple)">🧠 Agente Orquestador</div>
+      </div>
+      <div style="text-align:center;color:var(--text3);margin:3px 0">↓</div>
+      <div class="org-row">
+        <div class="org-box" style="background:rgba(0,200,160,.1);border-color:rgba(0,200,160,.3);color:var(--teal);font-size:10px">👤 Coordinador Operativo</div>
+        <div class="org-box" style="background:rgba(58,142,246,.1);border-color:rgba(58,142,246,.3);color:var(--blue);font-size:10px">👤 Analista Dashboard</div>
+        <div class="org-box" style="background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.3);color:var(--gold2);font-size:10px">👤 Esp. Calidad/Comercial</div>
+      </div>
+      <div style="text-align:center;color:var(--text3);margin:3px 0">↓</div>
+      <div class="org-row" style="gap:6px">
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">🌤 Climático</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">💰 Comercial</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">🛃 Aduanas</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">📈 Mercado</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">🍇 Calidad</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">🚢 Logístico</div>
+        <div class="org-box" style="background:var(--bg4);border-color:var(--border);color:var(--text2);font-size:10px;min-width:100px">📊 Financiero</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOCABULARIO OPERATIVO -->
+  <div class="card">
+    <div class="ctitle">Vocabulario operativo unificado</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Alerta roja"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Acción inmediata requerida. El Orquestador la emite al dashboard y notifica al Coordinador.</div></div>
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Decisión del Orquestador"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Recomendación prioritaria basada en señales de 2+ agentes. Primera instancia antes de consultar al CEO.</div></div>
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Ventana óptima"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Momento ideal de cosecha/embarque recomendado por Climático + Mercado + Orquestador de forma conjunta.</div></div>
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Margen real"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Rentabilidad validada por el Agente Financiero con datos reales de precio y FX del día.</div></div>
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Score de calidad"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Resultado del Agente de Calidad (0-100). Debe estar >95 para habilitar exportación al segmento premium.</div></div>
+      <div style="background:var(--bg4);border-radius:7px;padding:10px;border:1px solid var(--border)"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold2);margin-bottom:4px">"Pérdida evitable"</div><div style="font-size:10px;color:var(--text2);line-height:1.5">Fruta perdida que los agentes Climático, Logístico o de Calidad pudieron haber prevenido con acción oportuna.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+// ── UTILS ──
+function $e(id){return document.getElementById(id)}
+function set(id,val){const el=$e(id);if(el)el.textContent=val}
+function setHTML(id,val){const el=$e(id);if(el)el.innerHTML=val}
+
+// ── CLOCK ──
+setInterval(()=>{
+  const t=new Date().toLocaleTimeString('es-PE');
+  set('clockEl',t); set('lastUp',t);
+},1000);
+
+// ── TABS ──
+function switchTab(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.main').forEach((m,j)=>{
+    m.classList.toggle('active',i===j);
+    m.style.display=(i===j)?'block':'none';
+  });
+}
+
+// ── STATE ──
+const S={
+  prices:{usa:3.6,eu:3.2,asia:2.8},
+  fx:{pen:0,eur:0,gbp:0,jpy:0},
+  wx:{piura:null,ica:null,piura_hum:null},
+  qLog:[]
+};
+
+// ── CAMPAIGN DATA ──
+const CAMP={
+  '2025':{fob:8.4,cont:47,roi:410,tm:[0,0,120,180,0,0,0,0,220,310,290,180],fobK:[0,0,420,630,0,0,0,0,770,1085,1015,630],prices:{usa:3.6,eu:3.2,asia:2.8},lossOwn:[12,11,9,8,7,6,7,6,5,5,4,4],lossInd:[15,16,15,17,16,15,16,15,14,16,15,14]},
+  '2026':{fob:14.2,cont:78,roi:520,tm:[0,0,180,260,40,0,0,20,340,480,420,280],fobK:[0,0,648,936,144,0,0,72,1224,1728,1512,1008],prices:{usa:3.9,eu:3.45,asia:3.1},lossOwn:[8,7,6,5,5,4,4,4,3,3,3,3],lossInd:[15,16,15,17,16,15,16,15,14,16,15,14]}
+};
+const VARIETY={
+  'moscatel':{multiplier:1.0,priceAdj:0,label:'Uva Moscatel'},
+  'todo':{multiplier:1.65,priceAdj:-0.30,label:'Todo portafolio'}
+};
+let curCamp='2025', curVar='moscatel';
+
+function animCount(id,end,dur,pre='',suf='',dec=0){
+  const el=$e(id);if(!el)return;
+  const start=performance.now();
+  function step(t){const p=Math.min((t-start)/dur,1),e=1-Math.pow(1-p,3);el.textContent=pre+(end*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+function setCampaign(y){
+  curCamp=y;
+  ['2025','2026'].forEach(k=>{
+    const b=$e('btn-'+k); if(b)b.classList.toggle('active',k===y);
+    const b2=$e('btn-'+k+'b'); if(b2)b2.classList.toggle('active',k===y);
+  });
+  applyFilters();
+}
+function setVariety(v){
+  curVar=v;
+  [['mosc','moscatel'],['all','todo']].forEach(([k,vk])=>{
+    const b=$e('btn-'+k); if(b)b.classList.toggle('active',vk===v);
+    const b2=$e('btn-'+k+'b'); if(b2)b2.classList.toggle('active',vk===v);
+  });
+  applyFilters();
+}
+function applyFilters(){
+  const cd=CAMP[curCamp], vd=VARIETY[curVar];
+  const fob=+(cd.fob*vd.multiplier).toFixed(1);
+  const cont=Math.round(cd.cont*vd.multiplier);
+  animCount('k0',fob,700,'US$ ','M',1);
+  animCount('k1',cont,600);
+  const usa=+(cd.prices.usa+vd.priceAdj).toFixed(2);
+  const eu=+(cd.prices.eu+vd.priceAdj).toFixed(2);
+  const asia=+(cd.prices.asia+vd.priceAdj).toFixed(2);
+  set('mp0',`US$ ${usa}/kg`); set('mp1',`US$ ${eu}/kg`); set('mp2',`US$ ${asia}/kg`);
+  const avg=+((usa*.51+eu*.31+asia*.11+2.5*.07)).toFixed(2);
+  set('mp3',`US$ ${avg}/kg`);
+  if(S.fx.pen>0)set('mp3s',`En PEN: ${(avg*S.fx.pen).toFixed(2)}/kg`);
+  S.prices.usa=usa; S.prices.eu=eu; S.prices.asia=asia;
+  set('bmc-pusa',`US$ ${usa}/kg`);
+  set('bmc-fob',`US$ ${fob.toFixed(1)}M`);
+  set('bmc-fob2',`US$ ${fob.toFixed(1)}M`);
+  // update banner
+  const banner=$e('campaignBanner');
+  if(banner){
+    banner.textContent=curCamp==='2026'?`📈 Proyección 2026 — FOB estimado US$${fob.toFixed(1)}M · Portafolio: ${vd.label}`:`📊 Campaña 2025 — FOB proyectado US$${fob.toFixed(1)}M · Portafolio: ${vd.label}`;
+    banner.style.background=curCamp==='2026'?'rgba(156,111,222,.08)':'rgba(0,200,160,.08)';
+    banner.style.borderColor=curCamp==='2026'?'rgba(156,111,222,.3)':'rgba(0,200,160,.25)';
+    banner.style.color=curCamp==='2026'?'var(--purple)':'var(--teal)';
+  }
+  // update charts
+  if(charts.export){const m=vd.multiplier;charts.export.data.datasets[0].data=cd.tm.map(v=>Math.round(v*m));charts.export.data.datasets[1].data=cd.fobK.map(v=>Math.round(v*m));charts.export.update();}
+  if(charts.loss){charts.loss.data.datasets[0].data=cd.lossOwn;charts.loss.data.datasets[1].data=cd.lossInd;charts.loss.update();}
+  if(charts.priceLine){charts.priceLine.data.datasets[0].data=Array.from({length:16},()=>+(usa+(Math.random()-.5)*.15).toFixed(2));charts.priceLine.data.datasets[1].data=Array.from({length:16},()=>+(eu+(Math.random()-.5)*.12).toFixed(2));charts.priceLine.data.datasets[2].data=Array.from({length:16},()=>+(asia+(Math.random()-.5)*.1).toFixed(2));charts.priceLine.update();}
+}
+
+// ── CHARTS ──
+const charts={};
+const chartOpts=(extra={})=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}, ...extra});
+
+function initCharts(){
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const w16=Array.from({length:16},(_,i)=>`S${i+1}`);
+
+  // Export chart
+  charts.export=new Chart($e('exportChart'),{type:'bar',data:{labels:months,datasets:[
+    {label:'TM',data:CAMP['2025'].tm,backgroundColor:'rgba(201,162,39,.6)',borderColor:'#c9a227',borderWidth:1,yAxisID:'y'},
+    {label:'FOB US$K',data:CAMP['2025'].fobK,type:'line',borderColor:'#00c8a0',borderWidth:2,pointRadius:2,fill:false,tension:.4,yAxisID:'y1'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y1:{position:'right',ticks:{color:'#00c8a0',font:{size:9}},grid:{display:false}}}}});
+
+  // Mkt doughnut
+  const mktD=[51,31,11,7],mktL=['EE.UU.','Europa','Asia','Otros'],mktC=['#3a8ef6','#9c6fde','#00c8a0','#c9a227'];
+  charts.mkt=new Chart($e('mktChart'),{type:'doughnut',data:{labels:mktL,datasets:[{data:mktD,backgroundColor:mktC,borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'72%'}});
+  const leg=$e('mktLeg');if(leg)leg.innerHTML=mktL.map((l,i)=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:${mktC[i]};flex-shrink:0"></div><div><div style="font-size:11px;color:#e8eaf0">${l}</div><div style="font-size:9px;color:#3d4f6a">${mktD[i]}% FOB</div></div></div>`).join('');
+
+  // WX chart
+  charts.wx=new Chart($e('wxChart'),{type:'line',data:{labels:['Hoy','D-1','D-2','D-3','D-4','D-5','D-6'],datasets:[
+    {label:'Piura°C',data:[28,27,29,28,30,27,26],borderColor:'#f09040',borderWidth:2,fill:false,tension:.4,pointRadius:3},
+    {label:'Ica°C',data:[22,23,21,24,22,23,20],borderColor:'#9c6fde',borderWidth:2,fill:false,tension:.4,pointRadius:3}
+  ]},options:chartOpts()});
+
+  // FX chart
+  charts.fx=new Chart($e('fxChart'),{type:'line',data:{labels:Array.from({length:10},(_,i)=>`T-${9-i}`),datasets:[{label:'USD/PEN',data:Array(10).fill(3.72),borderColor:'#c9a227',borderWidth:2,fill:'origin',backgroundColor:'rgba(201,162,39,.08)',tension:.3,pointRadius:2}]},options:chartOpts({scales:{x:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#c9a227',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},min:3.5,max:3.9}}})});
+
+  // FX chart mercados tab
+  charts.fxMkt=new Chart($e('fxChartMkt'),{type:'line',data:{labels:Array.from({length:10},(_,i)=>`T-${9-i}`),datasets:[{label:'USD/PEN',data:Array(10).fill(3.72),borderColor:'#c9a227',borderWidth:2,fill:'origin',backgroundColor:'rgba(201,162,39,.07)',tension:.3,pointRadius:2}]},options:chartOpts({scales:{x:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#c9a227',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},min:3.5,max:3.9}}})});
+
+  // Loss chart
+  charts.loss=new Chart($e('lossChart'),{type:'line',data:{labels:Array.from({length:12},(_,i)=>`S${i+1}`),datasets:[
+    {label:'Tu empresa (IA)',data:[12,11,9,8,7,6,7,6,5,5,4,4],borderColor:'#00c8a0',borderWidth:2,fill:'origin',backgroundColor:'rgba(0,200,160,.07)',tension:.4,pointRadius:2},
+    {label:'Industria',data:[15,16,15,17,16,15,16,15,14,16,15,14],borderColor:'#f05a5a',borderWidth:2,borderDash:[5,3],fill:false,tension:.4,pointRadius:2}
+  ]},options:chartOpts()});
+
+  // Price line
+  charts.priceLine=new Chart($e('priceLine'),{type:'line',data:{labels:w16,datasets:[
+    {label:'EE.UU.',data:Array.from({length:16},()=>+(3.2+Math.random()*.8).toFixed(2)),borderColor:'#3a8ef6',borderWidth:2,fill:false,tension:.4,pointRadius:2},
+    {label:'Europa',data:Array.from({length:16},()=>+(2.9+Math.random()*.7).toFixed(2)),borderColor:'#9c6fde',borderWidth:2,fill:false,tension:.4,pointRadius:2},
+    {label:'Asia',data:Array.from({length:16},()=>+(2.5+Math.random()*.6).toFixed(2)),borderColor:'#00c8a0',borderWidth:2,fill:false,tension:.4,pointRadius:2}
+  ]},options:chartOpts({scales:{x:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#3d4f6a',font:{size:9},callback:v=>'$'+v},grid:{color:'rgba(255,255,255,.04)'},min:2,max:4.5}}})});
+
+  // Comp Bar
+  charts.compBar=new Chart($e('compBar'),{type:'bar',data:{labels:['Rapel','Pedregal','Ecosac','Burnt','HyperCept','Tu empresa'],datasets:[{data:[192,156,146,3.8,0,8.4],backgroundColor:['#3a8ef6','#9c6fde','#00c8a0','#f05a5a','#f09040','#c9a227'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw>0?`US$${c.raw}M FOB`:'SaaS (sin exportación)'}}},scales:{x:{ticks:{color:'#8b9ab5',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#3d4f6a',font:{size:9},callback:v=>`$${v}M`},grid:{color:'rgba(255,255,255,.04)'}}}}});
+
+  // Comp Scatter
+  charts.compScat=new Chart($e('compScat'),{type:'scatter',data:{datasets:[
+    {label:'Trad.',data:[{x:10,y:85},{x:10,y:80},{x:25,y:78}],backgroundColor:'#3a8ef6',pointRadius:9},
+    {label:'IA pura',data:[{x:90,y:65},{x:85,y:60}],backgroundColor:'#9c6fde',pointRadius:9},
+    {label:'Tú',data:[{x:75,y:70}],backgroundColor:'#c9a227',pointRadius:14,pointStyle:'star'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const ns=[['Rapel','Pedregal','Ecosac'],['Burnt','HyperCept'],['Tu empresa']];return`${ns[c.datasetIndex]?.[c.dataIndex]||''}: IA ${c.parsed.x}%, Éxito ${c.parsed.y}%`}}}},scales:{x:{ticks:{color:'#3d4f6a',font:{size:9},callback:v=>v+'% IA'},grid:{color:'rgba(255,255,255,.04)'},min:0,max:100},y:{ticks:{color:'#3d4f6a',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'},min:50,max:95}}}});
+
+  // Agent activity
+  charts.agAct=new Chart($e('agActChart'),{type:'bar',data:{labels:['Orquestador','Climático','Comercial','Aduanas','Mercado','Calidad','Logístico','Financiero'],datasets:[{data:[48,36,24,18,0,0,0,0],backgroundColor:['#c9a227','#3a8ef6','#f0c44a','#f09040','rgba(156,111,222,.3)','rgba(61,184,122,.3)','rgba(0,200,160,.3)','rgba(240,90,90,.3)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8b9ab5',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#3d4f6a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+}
+
+// ── COMPETITOR TABLE ──
+const COMPS=[
+  {n:'Rapel S.A.C.',tipo:'Tradicional',fob:'US$192M',ia:'10%',pv:'Escala industrial, variedades licenciadas, cadena de frío',exito:85,riesgo:15,c:'#3a8ef6',tag:'tag-t'},
+  {n:'El Pedregal S.A.',tipo:'Tradicional',fob:'US$156M',ia:'10%',pv:'Empaque integral, trazabilidad, certificaciones',exito:80,riesgo:20,c:'#9c6fde',tag:'tag-t'},
+  {n:'Ecosac Agrícola',tipo:'Tradicional',fob:'US$146M',ia:'25%',pv:'Diversificación, sostenibilidad, alianzas internacionales',exito:78,riesgo:22,c:'#00c8a0',tag:'tag-t'},
+  {n:'Burnt (YC-backed)',tipo:'Plataforma IA',fob:'US$3.8M seed',ia:'95%',pv:'Agentic OS completo para supply chain alimentaria',exito:65,riesgo:35,c:'#f05a5a',tag:'tag-ai'},
+  {n:'HyperCept AI',tipo:'Plataforma IA',fob:'SaaS',ia:'90%',pv:'5 agentes para cultivos, plagas y decisiones en tiempo real',exito:60,riesgo:40,c:'#c9a227',tag:'tag-ai'},
+  {n:'★ Tu empresa (8 agentes)',tipo:'Autónoma IA',fob:'US$8.4M proy.',ia:'75%',pv:'Moscatel premium + 8 agentes IA no-code + Orquestador CEO',exito:70,riesgo:30,c:'#f0c44a',tag:'tag-own'}
+];
+function buildCompTable(){
+  const tb=$e('compTbody');if(!tb)return;
+  tb.innerHTML=COMPS.map((c,i)=>`<tr>
+    <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px">${i+1}</td>
+    <td style="color:${c.c};font-weight:500">${c.n}</td>
+    <td><span class="tag ${c.tag}">${c.tipo}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${c.fob}</td>
+    <td><div style="display:flex;align-items:center;gap:4px"><div style="width:28px;background:var(--bg4);border-radius:2px;height:4px;overflow:hidden"><div style="width:${c.ia};background:${c.c};height:100%;border-radius:2px"></div></div><span style="font-size:9px;color:var(--text3)">${c.ia}</span></div></td>
+    <td style="font-size:10px;color:var(--text2);max-width:190px">${c.pv}</td>
+    <td><div style="display:flex;align-items:center;gap:4px"><div style="flex:1;background:var(--bg4);border-radius:2px;height:4px;overflow:hidden"><div style="width:${c.exito}%;background:${c.c};height:100%;border-radius:2px"></div></div><span style="font-size:9px;color:${c.c};font-family:'JetBrains Mono',monospace">${c.exito}%</span></div></td>
+    <td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:10px">${c.riesgo}%</td>
+  </tr>`).join('');
+}
+
+// ── SEASON CALENDAR ──
+function buildSeaCal(){
+  const el=$e('seaCal');if(!el)return;
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const peak=[1,1,0,0,0,0,0,0,0,1,1,1],act=[1,1,1,0,0,0,0,0,1,1,1,1];
+  el.innerHTML=`<div class="sea-grid">${months.map((m,i)=>`<div class="sea-month" style="${peak[i]?'background:rgba(201,162,39,.2);border-color:rgba(201,162,39,.4);color:var(--gold2)':act[i]?'background:rgba(0,200,160,.12);border-color:rgba(0,200,160,.25);color:var(--teal)':'background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07);color:var(--text3)'}"><div>${m}</div><div style="font-size:13px;margin-top:2px">${peak[i]?'🟡':act[i]?'🟢':'⚫'}</div></div>`).join('')}</div><div style="display:flex;gap:14px;font-size:10px;color:var(--text3);margin-top:6px"><span>🟡 Pico campaña</span><span>🟢 Activa</span><span>⚫ Descanso</span></div>`;
+}
+
+// ── LIVE SIM (precios simulados) ──
+function simLive(){
+  const noise=()=>(Math.random()-.48)*.08;
+  S.prices.usa=Math.max(3.0,+(CAMP[curCamp].prices.usa+noise()).toFixed(2));
+  S.prices.eu=Math.max(2.5,+(CAMP[curCamp].prices.eu+noise()).toFixed(2));
+  S.prices.asia=Math.max(2.2,+(CAMP[curCamp].prices.asia+noise()).toFixed(2));
+  set('mp0',`US$ ${S.prices.usa.toFixed(2)}/kg`);
+  set('mp1',`US$ ${S.prices.eu.toFixed(2)}/kg`);
+  set('mp2',`US$ ${S.prices.asia.toFixed(2)}/kg`);
+  const avg=+((S.prices.usa*.51+S.prices.eu*.31+S.prices.asia*.11+2.5*.07)).toFixed(2);
+  set('mp3',`US$ ${avg}/kg`);
+  if(S.fx.pen>0){set('mp3s',`En PEN: ${(avg*S.fx.pen).toFixed(2)}/kg`);set('ag-fi-fx',S.fx.pen.toFixed(3)+' PEN');}
+  set('bmc-pusa',`US$ ${S.prices.usa.toFixed(2)}/kg`);
+  // Orch sim decision
+  const decisions=[
+    `Clima Piura ${S.wx.piura||'--'}°C óptimo · Precio EE.UU. US$${S.prices.usa.toFixed(2)}/kg. Recomendación: cerrar contrato esta semana antes del vencimiento de ventana de precio.`,
+    `TC S/.${S.fx.pen?.toFixed(3)||'--'} favorable · Margen proyectado US$8,200/contenedor. No cubrir FX esta semana por tendencia favorable.`,
+    `Documentación pre-embarque requiere acción. Prioridad: activar RUC y abrir cuenta en dólares para primer contenedor 2026.`,
+    `Sistema: 4/8 agentes activos. Próxima prioridad: Agente de Mercado (Semana 4) con Veritrade para inteligencia competitiva.`
+  ];
+  const el=$e('orchDecision');
+  if(el && el.textContent.startsWith('⟳')){
+    set('orchDecision',decisions[Math.floor(Date.now()/30000)%decisions.length]);
+  }
+}
+
+// ── REAL WEATHER ──
+async function fetchWeather(){
+  try{
+    const [r1,r2]=await Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=-5.19&longitude=-80.63&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_max,precipitation_sum&timezone=America%2FLima&forecast_days=7'),
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=-14.07&longitude=-75.73&current=temperature_2m,relative_humidity_2m&timezone=America%2FLima')
+    ]);
+    const [d1,d2]=await Promise.all([r1.json(),r2.json()]);
+    S.wx.piura=d1.current.temperature_2m;
+    S.wx.piura_hum=d1.current.relative_humidity_2m;
+    S.wx.ica=d2.current.temperature_2m;
+    set('k2',S.wx.piura.toFixed(1)+'°C');
+    set('k2sub',`Hum ${S.wx.piura_hum}% · Ica ${S.wx.ica}°C · Real`);
+    set('ag-cl-piura',S.wx.piura.toFixed(1)+'°C');
+    set('ag-cl-hum',S.wx.piura_hum+'%');
+    if(charts.wx){charts.wx.data.datasets[0].data[0]=S.wx.piura;charts.wx.data.datasets[1].data[0]=S.wx.ica;charts.wx.update('none');}
+    [$e('dot-wx'),$e('sb-wx')].forEach(el=>{if(el)el.style.background='var(--teal)'});
+    // 7-day forecast for wx chart
+    if(d1.daily && charts.wx){
+      const tm=d1.daily.temperature_2m_max;
+      const ti=Array(7).fill(S.wx.ica);
+      charts.wx.data.datasets[0].data=tm.slice(0,7);
+      charts.wx.data.datasets[1].data=ti;
+      charts.wx.update('none');
+    }
+  }catch(e){set('k2sub','Error Open-Meteo');console.warn('[WX]',e.message);}
+}
+
+// ── REAL FX ──
+async function fetchFX(){
+  try{
+    const r=await fetch('https://open.er-api.com/v6/latest/USD');
+    const d=await r.json();
+    if(d.result!=='success')throw new Error('FX error');
+    S.fx.pen=d.rates.PEN; S.fx.eur=d.rates.EUR; S.fx.gbp=d.rates.GBP; S.fx.jpy=d.rates.JPY;
+    set('k3',S.fx.pen.toFixed(3)+' PEN');
+    set('k3sub',`Real · EUR: ${S.fx.eur.toFixed(4)}`);
+    set('fx-pen',S.fx.pen.toFixed(3));
+    set('fx-eur',S.fx.eur.toFixed(4));
+    set('fx-gbp',S.fx.gbp.toFixed(4));
+    set('fx-time',new Date().toLocaleTimeString('es-PE'));
+    set('bmc-pen','S/. '+S.fx.pen.toFixed(2));
+    set('ag-fi-fx',S.fx.pen.toFixed(3)+' PEN');
+    if(charts.fx){const h=charts.fx.data.datasets[0].data;h.push(+S.fx.pen.toFixed(3));if(h.length>10)h.shift();charts.fx.data.labels=h.map((_,i)=>`T-${h.length-1-i}`);charts.fx.update('none');}
+    if(charts.fxMkt){const h=charts.fxMkt.data.datasets[0].data;h.push(+S.fx.pen.toFixed(3));if(h.length>10)h.shift();charts.fxMkt.data.labels=h.map((_,i)=>`T-${h.length-1-i}`);charts.fxMkt.update('none');}
+    [$e('dot-fx'),$e('sb-fx')].forEach(el=>{if(el)el.style.background='var(--teal)'});
+    applyFilters();
+  }catch(e){set('k3sub','Error ExchangeRate');console.warn('[FX]',e.message);}
+}
+
+// ── GOOGLE SHEETS LOADER ──
+const SHEET_KEY='moscatel_sheet_id_v3';
+function saveSheetId(){
+  const v=$e('sheetIdInp')?.value?.trim();
+  if(!v){set('sheetStatus','⚠ Ingresa el ID del Sheet');return;}
+  try{localStorage.setItem(SHEET_KEY,v);}catch(e){}
+  set('sheetStatus','✓ ID guardado. Haz clic en "Cargar datos ahora".');
+}
+function getSheetId(){try{return localStorage.getItem(SHEET_KEY)||'';}catch(e){return '';}}
+
+// ── FETCH TAB: lee cualquier variante de nombre de columna ──
+async function fetchTab(sid, tab) {
+  const url = `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status} al leer ${tab}`);
+  const text = await r.text();
+  if (text.includes('errors')) throw new Error(`Sin acceso a pestaña: ${tab}`);
+  const json = JSON.parse(text.replace(/^[^{]+/, '').replace(/[^}]+$/, ''));
+  if (!json.table || !json.table.cols) throw new Error(`Pestaña vacía o sin datos: ${tab}`);
+  // Normalizar columnas: guardar con nombre original Y con uppercase sin espacios
+  const cols = json.table.cols.map(c => c.label || '');
+  return json.table.rows
+    .filter(row => row.c && row.c.some(cell => cell && (cell.v !== null && cell.v !== '')))
+    .map(row => {
+      const obj = {};
+      row.c.forEach((cell, i) => {
+        const val = cell?.v ?? cell?.f ?? '';
+        const key = cols[i];
+        if (key) {
+          obj[key] = val;                              // clave original
+          obj[key.toUpperCase()] = val;                // clave MAYUSCULAS
+          obj[key.toLowerCase()] = val;                // clave minusculas
+          obj[key.toUpperCase().replace(/\s+/g,'_')] = val; // sin espacios
+        }
+      });
+      return obj;
+    });
+}
+
+// ── GET: busca un valor en múltiples variantes de clave ──
+function g(obj, ...keys) {
+  for (const k of keys) {
+    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return String(obj[k]);
+    if (obj[k?.toUpperCase()] !== undefined && obj[k?.toUpperCase()] !== null && obj[k?.toUpperCase()] !== '') return String(obj[k.toUpperCase()]);
+  }
+  return null;
+}
+
+function colorAgente(val) {
+  if (!val) return '';
+  const v = String(val).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if (v.includes('VERDE') || v.includes('OK') || v.includes('FAVORABLE') || v.includes('OPTIMO') || v.includes('ACTIVO')) return 'ok';
+  if (v.includes('ROJO') || v.includes('CRITICO') || v.includes('URGENTE') || v.includes('PELIGRO') || v.includes('BLOQUEANTE')) return 'bad';
+  if (v.includes('AMARILLO') || v.includes('ATENCION') || v.includes('PRECAUCION') || v.includes('MEDIO')) return 'warn';
+  return '';
+}
+
+function setColored(id, val) {
+  const el = $e(id); if (!el) return;
+  el.textContent = val || '--';
+  el.className = 'agmv ' + colorAgente(val);
+}
+
+async function loadSheetData() {
+  const spin = $e('loadSpin'); if (spin) spin.classList.add('spin');
+  const sid = getSheetId();
+  const inp = $e('sheetIdInp'); if (inp && sid) inp.value = sid;
+  if (!sid) { set('sheetStatus', '⚠ Primero guarda el ID de tu Google Sheet.'); if (spin) spin.classList.remove('spin'); return; }
+
+  set('sheetStatus', '⟳ Conectando con Google Sheets...');
+
+  const [clima, com, adua, central, logis] = await Promise.allSettled([
+    fetchTab(sid, 'Dashboard_Climatico'),
+    fetchTab(sid, 'Dashboard_Comercial'),
+    fetchTab(sid, 'Dashboard_Aduanas'),
+    fetchTab(sid, 'Dashboard_Central'),
+    fetchTab(sid, 'Dashboard_Logistico')
+  ]);
+
+  const diag = []; // diagnóstico de cada pestaña
+
+  // ── CLIMÁTICO ──
+  if (clima.status === 'fulfilled' && clima.value.length > 0) {
+    const l = clima.value[clima.value.length - 1];
+    const cols = Object.keys(l).filter(k => k === k.toUpperCase()).join(', ');
+    const nivel = g(l,'NIVEL_RIESGO','nivel_riesgo','NIVEL');
+    const piura = g(l,'TEMP_PIURA','temp_piura','TEMPERATURA_PIURA');
+    const hum   = g(l,'HUM_PIURA','hum_piura','HUMEDAD_PIURA','HUMEDAD');
+    const vent  = g(l,'VENTANA_COSECHA','ventana_cosecha','VENTANA');
+    const res   = g(l,'RESUMEN','resumen','SUMMARY');
+    const hora  = g(l,'HORA','hora','TIMESTAMP','FECHA');
+    setColored('ag-cl-nivel', nivel);
+    set('ag-cl-piura', (piura || S.wx.piura?.toFixed(1) || '--') + '°C');
+    set('ag-cl-hum', (hum || '--') + '%');
+    set('ag-cl-ventana', vent || '--');
+    set('ag-cl-brief', res || 'Agente ejecutado — sin resumen en esta fila');
+    set('ag-cl-hora', hora || '--');
+    diag.push(`🟢 Climático: ${clima.value.length} filas · cols: ${cols.slice(0,80)}`);
+  } else {
+    const err = clima.status === 'rejected' ? clima.reason?.message : 'Pestaña vacía o sin datos';
+    diag.push(`🔴 Climático: ${err}`);
+    set('ag-cl-brief', `⚠ ${err}`);
+  }
+
+  // ── COMERCIAL ──
+  if (com.status === 'fulfilled' && com.value.length > 0) {
+    const l = com.value[com.value.length - 1];
+    const cols = Object.keys(l).filter(k => k === k.toUpperCase()).join(', ');
+    const sem  = g(l,'SEMAFORO','semaforo','NIVEL','ESTADO');
+    const pen  = g(l,'USD_PEN','usd_pen','TIPO_CAMBIO','tipo_cambio','TC_USD_PEN');
+    const prec = g(l,'PRECIO_USD_KG','precio_usd_kg','PRECIO_MOSCATEL','precio_moscatel');
+    const dec  = g(l,'DECISION','decision');
+    const res  = g(l,'RESUMEN','resumen');
+    const hora = g(l,'HORA','hora','TIMESTAMP','FECHA');
+    setColored('ag-co-semaforo', sem);
+    set('ag-co-pen', 'S/.' + (pen || S.fx.pen?.toFixed(3) || '--'));
+    set('ag-co-precio', 'US$' + (prec || '1.85') + '/kg');
+    set('ag-co-decision', dec || '--');
+    set('ag-co-brief', res || 'Agente ejecutado — sin resumen en esta fila');
+    set('ag-co-hora', hora || '--');
+    diag.push(`🟢 Comercial: ${com.value.length} filas · cols: ${cols.slice(0,80)}`);
+  } else {
+    const err = com.status === 'rejected' ? com.reason?.message : 'Pestaña vacía o sin datos';
+    diag.push(`🔴 Comercial: ${err}`);
+    set('ag-co-brief', `⚠ ${err}`);
+  }
+
+  // ── ADUANAS ──
+  if (adua.status === 'fulfilled' && adua.value.length > 0) {
+    const l = adua.value[adua.value.length - 1];
+    const cols = Object.keys(l).filter(k => k === k.toUpperCase()).join(', ');
+    const nivel = g(l,'NIVEL_ALERTA','nivel_alerta','NIVEL','ESTADO');
+    const docs  = g(l,'TOTAL_ALERTAS','total_alertas','ALERTAS','DOCS_FALTANTES');
+    const riesgo= g(l,'RIESGO_EMBARQUE','riesgo_embarque','RIESGO');
+    const valor = g(l,'VALOR_TOTAL_USD','valor_total_usd','VALOR','FOB');
+    const res   = g(l,'RESUMEN','resumen');
+    const hora  = g(l,'HORA','hora','TIMESTAMP','FECHA');
+    setColored('ag-ad-nivel', nivel);
+    set('ag-ad-docs', docs || '--');
+    set('ag-ad-riesgo', riesgo || '--');
+    set('ag-ad-valor', 'US$' + (valor || '--'));
+    set('ag-ad-brief', res || 'Agente ejecutado — sin resumen en esta fila');
+    set('ag-ad-hora', hora || '--');
+    diag.push(`🟢 Aduanas: ${adua.value.length} filas · cols: ${cols.slice(0,80)}`);
+  } else {
+    const err = adua.status === 'rejected' ? adua.reason?.message : 'Pestaña vacía o sin datos';
+    diag.push(`🔴 Aduanas: ${err}`);
+    set('ag-ad-brief', `⚠ ${err}`);
+  }
+
+  // ── ORQUESTADOR ──
+  if (central.status === 'fulfilled' && central.value.length > 0) {
+    const l = central.value[central.value.length - 1];
+    const cols = Object.keys(l).filter(k => k === k.toUpperCase()).join(', ');
+    const nivel  = g(l,'NIVEL_GLOBAL','nivel_global','NIVEL','ESTADO');
+    const clima2 = g(l,'ESTADO_CLIMATICO','estado_climatico','CLIMATICO');
+    const com2   = g(l,'ESTADO_COMERCIAL','estado_comercial','COMERCIAL');
+    const dec    = g(l,'DECISION_DIA','decision_dia','DECISION','decision');
+    const brief  = g(l,'BRIEFING','briefing','RESUMEN','resumen');
+    const alerta = g(l,'ALERTA_CRITICA','alerta_critica','ALERTA');
+    const hora   = g(l,'HORA','hora','TIMESTAMP','FECHA');
+    setColored('ag-or-nivel', nivel);
+    set('ag-or-clima', clima2 || '--');
+    set('ag-or-com', com2 || '--');
+    set('ag-or-decision', dec || '--');
+    set('ag-or-brief', brief || 'Orquestador ejecutado — sin briefing en esta fila');
+    set('ag-or-hora', hora || '--');
+    set('orchDecision', brief || 'Sin briefing aún');
+    set('om2', nivel || '--');
+    set('om3', alerta || '--');
+    set('om4', hora || '--');
+    set('orchLastTime', hora || '--');
+    diag.push(`🟢 Orquestador: ${central.value.length} filas · cols: ${cols.slice(0,80)}`);
+  } else {
+    const err = central.status === 'rejected' ? central.reason?.message : 'Pestaña vacía o sin datos';
+    diag.push(`🔴 Orquestador: ${err}`);
+    set('ag-or-brief', `⚠ ${err}`);
+  }
+
+  // ── LOGÍSTICO ──
+  if (logis.status === 'fulfilled' && logis.value.length > 0) {
+    const l = logis.value[logis.value.length - 1];
+    // Debug: ver nombres exactos de columnas que llegan del sheet
+    console.log('[Logístico] Claves originales del sheet:', Object.keys(l).filter((_,i)=>i%2===0));
+    const cols = Object.keys(l).filter(k => k === k.toUpperCase()).join(', ');
+    const nivel  = g(l,'NIVEL_ALERTA','nivel_alerta','NIVEL','Nivel_alerta');
+    const temp   = g(l,'TEMPERATURA_C','temperatura_c','Temperatura_c','TEMP','temp','Temp','TEMPERATURA','temperatura');
+    const brix   = g(l,'BRIX','brix','Brix');
+    const riesgo = g(l,'RIESGO_CARGA','riesgo_carga','Riesgo_carga','RIESGO');
+    const estado = g(l,'ESTADO_CONTENEDOR','estado_contenedor','Estado_contenedor','ESTADO');
+    const lote   = g(l,'ID_LOTE','id_lote','Id_lote','LOTE');
+    const res    = g(l,'RESUMEN','resumen','Resumen');
+    const hora   = g(l,'HORA','hora','Hora','TIMESTAMP','FECHA');
+    const modo   = g(l,'MODO','modo','Modo');
+
+    // Color dinámico de temperatura
+    const tempNum = parseFloat(temp);
+    const tempClass = !isNaN(tempNum) ? (tempNum > 8 ? 'bad' : tempNum > 5 ? 'warn' : 'ok') : '';
+
+    setColored('ag-lg-nivel', nivel);
+    const tempEl = document.getElementById('ag-lg-temp');
+    if (tempEl) { tempEl.textContent = temp ? temp + '°C' : '--'; tempEl.className = 'agmv ' + tempClass; }
+    set('ag-lg-brix',   brix   ? brix + '°'  : '--');
+    setColored('ag-lg-riesgo', riesgo);
+    set('ag-lg-brief',  res    || 'Agente ejecutado — sin resumen en esta fila');
+    set('ag-lg-hora',   hora   || '--');
+    set('ag-lg-lote',   lote   || '--');
+    set('ag-lg-estado', estado || '--');
+    const modoEl = document.getElementById('ag-lg-modo');
+    if (modoEl) {
+      modoEl.textContent = modo === 'TESTEO' ? '🧪 MODO TESTEO' : '✅ PRODUCCIÓN';
+      modoEl.style.color = modo === 'TESTEO' ? 'var(--orange)' : 'var(--teal)';
+    }
+    diag.push(`🟢 Logístico: ${logis.value.length} filas · cols: ${cols.slice(0,80)}`);
+    // Debug: log todas las claves de la última fila para verificar nombres exactos
+    console.log('[Logístico] Claves disponibles:', Object.keys(l).filter(k => k === k.toUpperCase()));
+    console.log('[Logístico] Valor temp encontrado:', temp, '| brix:', brix, '| nivel:', nivel);
+
+    // Actualizar contador de contenedores con sensores ESP32 reales activos
+    const contEl = document.getElementById('k1');
+    if (contEl) {
+      contEl.textContent = '1';
+      const subEl = contEl.nextElementSibling;
+      if (subEl) subEl.textContent = '1 sensor ESP32 activo';
+    }
+  } else {
+    const err = logis.status === 'rejected' ? logis.reason?.message : 'Pestaña vacía o sin datos';
+    diag.push(`🔴 Logístico: ${err}`);
+    set('ag-lg-brief', `⚠ ${err}`);
+  }
+
+  set('om1', '5 / 8');
+
+  // ── STATUS CON DIAGNÓSTICO ──
+  const ok = diag.filter(d => d.startsWith('🟢')).length;
+  const fail = diag.filter(d => d.startsWith('🔴')).length;
+
+  if (ok === 0 && fail > 0) {
+    set('sheetStatus', `⚠ No se encontraron datos en ninguna pestaña. ¿Corriste los agentes en n8n hoy? · ${new Date().toLocaleTimeString('es-PE')}`);
+  } else if (fail > 0) {
+    set('sheetStatus', `⚠ ${ok} pestañas OK · ${fail} con problemas — revisa la consola del navegador (F12) para ver detalle · ${new Date().toLocaleTimeString('es-PE')}`);
+  } else {
+    set('sheetStatus', `✓ ${ok}/5 pestañas cargadas correctamente — ${new Date().toLocaleTimeString('es-PE')}`);
+  }
+
+  // Log diagnóstico en consola para debugging
+  console.group('[Dashboard Moscatel] Diagnóstico Sheets');
+  diag.forEach(d => console.log(d));
+  console.groupEnd();
+
+  if (spin) spin.classList.remove('spin');
+}
+
+// ── API KEY & CLAUDE ──
+const APK_KEY='moscatel_claude_key_v3';
+function loadKey(){try{return localStorage.getItem(APK_KEY)||'';}catch(e){return '';}}
+function saveKey(){
+  const v=$e('apkInp')?.value?.trim();
+  if(!v){showKS('empty','⚠','Campo vacío. Pega tu API Key.');return;}
+  if(!v.startsWith('sk-ant')){showKS('empty','⚠','Formato incorrecto (debe iniciar con sk-ant...)');return;}
+  try{localStorage.setItem(APK_KEY,v);}catch(e){}
+  showKS('ok','✓','API Key guardada. Análisis IA activados.');
+  $e('apkInp').value=v.slice(0,14)+'••••••••••••'+v.slice(-4);
+}
+function clearKey(){try{localStorage.removeItem(APK_KEY);}catch(e){}const i=$e('apkInp');if(i)i.value='';showKS('empty','⚠','Key eliminada.');}
+function showKS(type,icon,text){const el=$e('apkStatus');if(!el)return;el.className='apk-status '+type;set('apkIcon',icon);set('apkTxt',text);}
+
+const PROMPTS=[
+  ()=>`Analiza la situación actual del mercado de uva Moscatel premium del Perú. Precio EE.UU. US$${S.prices.usa.toFixed(2)}/kg, Europa US$${S.prices.eu.toFixed(2)}/kg, USD/PEN ${S.fx.pen?.toFixed(3)||'~3.72'}, Temp. Piura ${S.wx.piura||'--'}°C. Proporciona: 1) Oportunidad esta semana, 2) Riesgos inmediatos, 3) Recomendaciones con números. Responde en español, conciso y con bullet points.`,
+  ()=>`¿Cuáles son las tendencias de precios de uva Moscatel en EE.UU. y Europa? USD/PEN actual: ${S.fx.pen?.toFixed(3)||'~3.72'}. Incluye variaciones estacionales y presión de Chile y Sudáfrica. Responde en español con datos concretos.`,
+  ()=>`Mi empresa tiene 8 agentes IA para exportar Moscatel del Perú. Analiza las 5 ventajas competitivas frente a: Rapel (US$192M), El Pedregal (US$156M), Ecosac (US$146M), Burnt (IA pura, sin uva) y HyperCept (SaaS AgTech). ¿Cómo monetizar cada ventaja? Responde en español.`,
+  ()=>`¿Cuál es la estrategia óptima para maximizar el ROI de un sistema de 8 agentes IA que cuesta US$269/mes y exporta Moscatel del Perú? ROI actual: +400%. Incluye KPIs y timeframes concretos. Responde en español.`
+];
+
+async function fetchInsight(idx){
+  const txtId=idx<=1?'it0':'it1', ldId=idx<=1?'ld0':'ld1';
+  const key=loadKey(), txEl=$e(txtId), ldEl=$e(ldId);
+  if(!key){
+    if(txEl){txEl.style.display='block';txEl.innerHTML='<div style="padding:10px;background:rgba(240,90,90,.07);border:1px solid rgba(240,90,90,.2);border-radius:6px;color:var(--red)">⚠ Ingresa tu API Key arriba para activar los análisis IA.</div>';}
+    return;
+  }
+  if(ldEl)ldEl.style.display='flex';if(txEl)txEl.style.display='none';
+  S.qLog.unshift({q:PROMPTS[idx]().slice(0,72)+'...',t:new Date().toLocaleTimeString('es-PE')});
+  updateQHist();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
+        system:`Eres el analista estratégico de una empresa autónoma agroexportadora de Uva Moscatel del Perú con 8 agentes IA no-code. Cuesta US$269/mes, reduce pérdidas 30%, ROI >400%. TC real USD/PEN: ${S.fx.pen?.toFixed(3)||'3.72'}. Temp. Piura: ${S.wx.piura||'N/A'}°C. Responde en español, conciso, con datos concretos y bullet points.`,
+        messages:[{role:'user',content:PROMPTS[idx]()}]})
+    });
+    if(!r.ok){const err=await r.json().catch(()=>({}));if(r.status===401)showKS('empty','✕','API Key inválida. Verifica en console.anthropic.com.');throw new Error(err?.error?.message||`HTTP ${r.status}`);}
+    const data=await r.json();
+    const ans=data.content?.map(b=>b.text||'').join('\n')||'Sin respuesta';
+    if(txEl){
+      txEl.style.display='block';
+      txEl.innerHTML=ans.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--text)">$1</strong>').replace(/^[•\-]\s/gm,'<span style="color:var(--blue)">●</span> ')
+        +`<div style="margin-top:10px;padding-top:7px;border-top:1px solid var(--border);font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace">✦ Claude AI · ${new Date().toLocaleTimeString('es-PE')} · FX: ${S.fx.pen?.toFixed(3)||'--'} PEN · Piura: ${S.wx.piura||'--'}°C</div>`;
+    }
+  }catch(e){
+    if(txEl){txEl.style.display='block';txEl.innerHTML=`<div style="padding:10px;background:rgba(240,90,90,.07);border:1px solid rgba(240,90,90,.2);border-radius:6px"><div style="font-weight:600;color:var(--red);margin-bottom:4px">Error al conectar con Claude AI</div><div style="font-size:11px;color:var(--text2)">${e.message}</div></div>`;}
+  }finally{if(ldEl)ldEl.style.display='none';}
+}
+
+function updateQHist(){
+  const el=$e('qHist');if(!el)return;
+  if(!S.qLog.length){el.innerHTML='<div style="color:var(--text3);font-size:11px;padding:7px">Sin consultas en esta sesión.</div>';return;}
+  el.innerHTML=S.qLog.slice(0,6).map(q=>`<div class="qhist-item"><span style="color:var(--text2);flex:1">${q.q}</span><span style="color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:10px">${q.t}</span></div>`).join('');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',async()=>{
+  initCharts();
+  buildCompTable();
+  buildSeaCal();
+  // Load saved sheet ID
+  const sid=getSheetId();if(sid){const i=$e('sheetIdInp');if(i)i.value=sid;}
+  // Load saved API key
+  const k=loadKey();if(k){$e('apkInp').value=k.slice(0,14)+'••••••••••••'+k.slice(-4);showKS('ok','✓','API Key lista.');}
+  updateQHist();
+  // Fetch real data
+  await Promise.all([fetchWeather(),fetchFX()]);
+  applyFilters();
+  simLive();
+  // Intervals
+  setInterval(simLive,8000);
+  setInterval(fetchWeather,10*60*1000);
+  setInterval(fetchFX,30*60*1000);
+  setInterval(()=>{
+    if(charts.priceLine){
+      charts.priceLine.data.datasets[0].data.push(+(S.prices.usa+(Math.random()-.5)*.08).toFixed(2));
+      charts.priceLine.data.datasets[1].data.push(+(S.prices.eu+(Math.random()-.5)*.08).toFixed(2));
+      charts.priceLine.data.datasets[2].data.push(+(S.prices.asia+(Math.random()-.5)*.07).toFixed(2));
+      charts.priceLine.data.labels.push('→');
+      if(charts.priceLine.data.labels.length>20){charts.priceLine.data.labels.shift();charts.priceLine.data.datasets.forEach(d=>d.data.shift());}
+      charts.priceLine.update('none');
+    }
+  },15000);
+});
+</script>
+</body>
+</html>
