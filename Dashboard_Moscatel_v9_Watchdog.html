@@ -530,15 +530,16 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <div class="agico" style="background:rgba(156,111,222,.15)">📈</div>
         <div><div class="agname">Mercado</div><div class="agrole">Competidores · Demanda · FOB</div></div>
       </div>
-      <div class="agpill dev"><span class="sdot" style="background:var(--text3)"></span>⚫ En desarrollo · Semana 4</div>
+    <div class="agpill ok" id="ag-mk-pill"><span class="sdot" style="background:var(--text3)"></span>⟳ Cargando...</div>
       <div class="agm">
-        <div class="agmrow"><span class="agmk">Precio USA ref.</span><span class="agmv">$1.85/kg</span></div>
-        <div class="agmrow"><span class="agmk">Precio Europa ref.</span><span class="agmv">$1.65/kg</span></div>
-        <div class="agmrow"><span class="agmk">Competidores</span><span class="agmv">Chile · Sudáfrica</span></div>
-        <div class="agmrow"><span class="agmk">Pendiente</span><span class="agmv warn">Veritrade $80/mes</span></div>
+        <div class="agmrow"><span class="agmk">FOB recomendado</span><span class="agmv ok" id="ag-mk-fob">--/kg</span></div>
+        <div class="agmrow"><span class="agmk">Precio LA</span><span class="agmv" id="ag-mk-la">--</span></div>
+        <div class="agmrow"><span class="agmk">Precio NY</span><span class="agmv" id="ag-mk-ny">--</span></div>
+        <div class="agmrow"><span class="agmk">Score oportunidad</span><span class="agmv" id="ag-mk-score">--%</span></div>
+        <div class="agmrow"><span class="agmk">Semáforo</span><span class="agmv" id="ag-mk-semaforo">--</span></div>
       </div>
-      <div class="agbrief">Requiere Veritrade + TradeMap para datos reales de volumen importación</div>
-      <div class="agsrc">📡 Veritrade · TradeMap (pendiente suscripción)</div>
+      <div class="agbrief" id="ag-mk-brief">⟳ Conecta Sheets para ver análisis de mercado real</div>
+      <div class="agsrc">📡 USDA · FRED · Dashboard_Mercado · Últ: <span id="ag-mk-hora">--</span></div>
     </div>
 
     <!-- AG 6: CALIDAD -->
@@ -1438,7 +1439,7 @@ async function loadSheetData() {
 
   set('sheetStatus', '⟳ Conectando con Google Sheets...');
 
-  const [clima, com, adua, central, logis, calid, finan, watchdog] = await Promise.allSettled([
+  const [clima, com, adua, central, logis, calid, finan, watchdog, mercado] = await Promise.allSettled([
     fetchTab(sid, 'Dashboard_Climatico'),
     fetchTab(sid, 'Dashboard_Comercial'),
     fetchTab(sid, 'Dashboard_Aduanas'),
@@ -1447,6 +1448,7 @@ async function loadSheetData() {
     fetchTab(sid, 'Dashboard_Calidad'),
     fetchTab(sid, 'Dashboard_Financiero'),
     fetchTab(sid, 'Watchdog_Log')
+    fetchTab(sid, 'Dashboard_Mercado')
   ]);
 
   const diag = []; // diagnóstico de cada pestaña
@@ -1780,8 +1782,37 @@ async function loadSheetData() {
     set('ag-fi-brief','⚠ '+err);
   }
 
-  set('om1', '6 / 8');
-
+  set('om1', mercado && mercado.status === 'fulfilled' && mercado.value.length > 0 ? '7 / 8' : '6 / 8');
+// ── MERCADO ──
+  if (mercado && mercado.status === 'fulfilled' && mercado.value.length > 0) {
+    const l = mercado.value[mercado.value.length - 1];
+    const fob   = g(l,'FOB_RECOMENDADO','fob_recomendado','FOB_ACTUAL');
+    const la    = g(l,'PRECIO_LA_PROM','precio_la_prom','PRECIO_LA');
+    const ny    = g(l,'PRECIO_NY_PROM','precio_ny_prom','PRECIO_NY');
+    const score = g(l,'SCORE_OPORTUNIDAD_PCT','score_oportunidad_pct','SCORE_OPORTUNIDAD');
+    const sem   = g(l,'SEMAFORO','semaforo','NIVEL');
+    const res   = g(l,'RESUMEN','resumen');
+    const hora  = g(l,'HORA','hora','FECHA');
+    setColored('ag-mk-semaforo', sem);
+    set('ag-mk-fob',   fob   ? 'US$' + fob + '/kg' : '--');
+    set('ag-mk-la',    la    ? 'US$' + la  + '/kg' : '--');
+    set('ag-mk-ny',    ny    ? 'US$' + ny  + '/kg' : '--');
+    set('ag-mk-score', score ? score + '%' : '--%');
+    set('ag-mk-brief', res   || 'Agente Mercado ejecutado');
+    set('ag-mk-hora',  hora  || '--');
+    const pill = document.getElementById('ag-mk-pill');
+    if (pill) {
+      const cls = sem === 'VERDE' ? 'ok' : sem === 'AMARILLO' ? 'warn' : sem === 'ROJO' ? 'bad' : 'dev';
+      pill.className = 'agpill ' + cls;
+      pill.innerHTML = `<span class="sdot" style="background:var(--teal)"></span>🟢 ACTIVO · Datos reales`;
+    }
+    if (mercado.value.length > 0) ag_ok++;
+    diag.push(`🟢 Mercado: ${mercado.value.length} filas · FOB: ${fob} · Score: ${score}%`);
+  } else {
+    const err = mercado && mercado.status === 'rejected' ? mercado.reason?.message : 'Pestaña vacía — ejecuta Agente Mercado en n8n';
+    diag.push(`🔴 Mercado: ${err}`);
+    set('ag-mk-brief', `⚠ ${err}`);
+  }
   // ── SINCRONIZAR TODOS LOS TABS (después de cargar todos los datos) ──
   D.sync();
 
