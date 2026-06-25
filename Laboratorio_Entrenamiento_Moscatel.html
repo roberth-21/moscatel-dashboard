@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Entrenamiento · Moscatel Perú</title>
+<style>
+  :root{
+    --vino:#6B1F2A; --vino2:#8B2635; --oro:#B8860B; --oro-claro:#D9A93B;
+    --crema:#F5ECD7; --tinta:#1A1014; --tinta2:#241419;
+    --verde:#2E8B57; --ambar:#D9892B; --rojo:#C0392B;
+    --linea:rgba(216,169,59,.18); --texto:#EDE3D0; --tenue:#A89684;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(139,38,53,.25), transparent),
+      radial-gradient(900px 500px at -10% 110%, rgba(184,134,11,.12), transparent),
+      var(--tinta);
+    color:var(--texto); min-height:100vh; line-height:1.5;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+
+  /* Encabezado */
+  header{display:flex;align-items:flex-end;justify-content:space-between;
+    border-bottom:1px solid var(--linea);padding-bottom:22px;margin-bottom:8px;flex-wrap:wrap;gap:16px}
+  .brand h1{font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--oro);font-weight:600}
+  .brand h2{font-size:34px;font-weight:300;letter-spacing:-.01em;margin-top:6px}
+  .brand h2 b{font-weight:700;color:var(--oro-claro)}
+  .brand p{color:var(--tenue);font-size:13px;margin-top:4px}
+  .live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tenue);
+    border:1px solid var(--linea);border-radius:100px;padding:8px 14px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--verde);box-shadow:0 0 0 0 rgba(46,139,87,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,139,87,.5)}70%{box-shadow:0 0 0 8px rgba(46,139,87,0)}100%{box-shadow:0 0 0 0 rgba(46,139,87,0)}}
+
+  .intro{color:var(--tenue);font-size:14px;max-width:680px;margin:18px 0 28px}
+
+  /* Panel de control */
+  .control{background:linear-gradient(180deg,var(--tinta2),rgba(36,20,25,.4));
+    border:1px solid var(--linea);border-radius:16px;padding:24px;margin-bottom:28px}
+  .control-grid{display:grid;grid-template-columns:1.4fr 1fr auto;gap:18px;align-items:end}
+  label.fld{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--tenue);margin-bottom:8px}
+  select,input{width:100%;background:var(--tinta);border:1px solid var(--linea);color:var(--texto);
+    padding:13px 14px;border-radius:10px;font-size:15px;font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--oro)}
+  .reps{display:flex;gap:8px}
+  .reps button{flex:1;background:var(--tinta);border:1px solid var(--linea);color:var(--texto);
+    padding:13px 0;border-radius:10px;cursor:pointer;font-size:15px;transition:.15s}
+  .reps button.on{background:var(--oro);color:var(--tinta);border-color:var(--oro);font-weight:700}
+  .run{background:linear-gradient(135deg,var(--oro),var(--oro-claro));color:var(--tinta);
+    border:none;padding:14px 30px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;
+    white-space:nowrap;transition:.15s;box-shadow:0 6px 18px rgba(184,134,11,.25)}
+  .run:hover{transform:translateY(-1px)}
+  .run:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  /* Barra de progreso */
+  .progress-wrap{margin-top:22px;display:none}
+  .progress-wrap.show{display:block}
+  .ptrack{height:10px;background:var(--tinta);border-radius:100px;overflow:hidden;border:1px solid var(--linea)}
+  .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--vino2),var(--oro));transition:width .4s ease}
+  .pmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--tenue);margin-top:10px}
+  .pmeta b{color:var(--texto)}
+
+  /* Resumen del agente (KPIs grandes) */
+  .verdict{display:none;margin-bottom:28px}
+  .verdict.show{display:block;animation:fade .5s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .agent-name{font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--oro);margin-bottom:14px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--tinta2);border:1px solid var(--linea);border-radius:14px;padding:20px;text-align:center}
+  .kpi .num{font-size:40px;font-weight:700;line-height:1}
+  .kpi .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--tenue);margin-top:8px}
+  .kpi.cert{border-color:rgba(46,139,87,.4)}
+  .badge{display:inline-block;padding:6px 16px;border-radius:100px;font-weight:700;font-size:14px;margin-top:6px}
+  .b-cert{background:rgba(46,139,87,.18);color:#6FCF97;border:1px solid rgba(46,139,87,.4)}
+  .b-no{background:rgba(192,57,43,.18);color:#E88;border:1px solid rgba(192,57,43,.4)}
+
+  /* Dimensiones promedio */
+  .dims{background:var(--tinta2);border:1px solid var(--linea);border-radius:14px;padding:22px;margin-top:14px}
+  .dims h3{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--tenue);margin-bottom:16px}
+  .dimbar{margin-bottom:14px}
+  .dimbar:last-child{margin-bottom:0}
+  .dimbar .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+  .dtrack{height:8px;background:var(--tinta);border-radius:100px;overflow:hidden}
+  .dfill{height:100%;border-radius:100px;transition:width .6s ease}
+
+  /* Tabla de resultados en vivo */
+  .results{background:var(--tinta2);border:1px solid var(--linea);border-radius:14px;overflow:hidden;margin-top:24px;display:none}
+  .results.show{display:block}
+  .results h3{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--tenue);padding:18px 22px;border-bottom:1px solid var(--linea)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:13px 16px;text-align:left;font-size:13px;border-bottom:1px solid rgba(216,169,59,.07)}
+  th{color:var(--tenue);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  td.score{font-weight:700;font-family:'Consolas',monospace}
+  tr:last-child td{border-bottom:none}
+  .pill{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
+  .p-AP{background:rgba(46,139,87,.18);color:#6FCF97}
+  .p-OB{background:rgba(217,137,43,.18);color:#E8B563}
+  .p-RE{background:rgba(192,57,43,.18);color:#E88}
+  .p-ER{background:rgba(120,120,120,.18);color:#aaa}
+  .disp{font-size:11px;color:var(--tenue)}
+  .empty{padding:50px;text-align:center;color:var(--tenue)}
+
+  /* Interpretación */
+  .insight{background:linear-gradient(180deg,rgba(107,31,42,.25),transparent);
+    border:1px solid var(--linea);border-left:3px solid var(--oro);border-radius:12px;
+    padding:18px 22px;margin-top:24px;display:none;font-size:14px;color:var(--texto)}
+  .insight.show{display:block}
+  .insight b{color:var(--oro-claro)}
+  footer{margin-top:50px;text-align:center;color:var(--tenue);font-size:12px}
+  @media(max-width:760px){.control-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Moscatel Perú · Sistema Autónomo</h1>
+      <h2>Laboratorio de <b>Entrenamiento</b></h2>
+      <p>Evaluación por lotes con repeticiones · promedio y dispersión</p>
+    </div>
+    <div class="live"><span class="dot"></span> Conectado a n8n · UTC-5</div>
+  </header>
+
+  <p class="intro">Pon a prueba a un agente contra toda su batería de escenarios. Cada escenario se ejecuta varias veces para medir no solo el puntaje, sino su <b style="color:var(--oro-claro)">consistencia</b> — un agente que acierta una vez y falla otra no está certificado.</p>
+
+  <!-- Control -->
+  <div class="control">
+    <div class="control-grid">
+      <div>
+        <label class="fld">Agente a evaluar</label>
+        <select id="agente">
+          <option value="Calidad">Calidad — Soberanía del Fruto (R1)</option>
+          <option value="Comercial">Comercial — Verdad Radical (R2)</option>
+          <option value="Financiero">Financiero — Justo Precio (R3)</option>
+          <option value="Logistico">Logístico — Trazabilidad (R2)</option>
+          <option value="Climatico">Climático — ESG / Riesgo</option>
+          <option value="Aduanas">Aduanas — Trazabilidad documental</option>
+          <option value="Mercado">Mercado — Anti-sobreoptimización (R4)</option>
+        </select>
+      </div>
+      <div>
+        <label class="fld">Repeticiones por escenario</label>
+        <div class="reps" id="reps">
+          <button data-r="1">×1</button>
+          <button data-r="3" class="on">×3</button>
+          <button data-r="5">×5</button>
+        </div>
+      </div>
+      <button class="run" id="run">▶ Evaluar agente</button>
+    </div>
+
+    <div class="progress-wrap" id="pwrap">
+      <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+      <div class="pmeta">
+        <span id="pnow">Preparando…</span>
+        <span><b id="pcount">0</b> / <span id="ptotal">0</span> ejecuciones</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Veredicto del agente -->
+  <div class="verdict" id="verdict">
+    <div class="agent-name" id="vname">Agente</div>
+    <div class="kpis">
+      <div class="kpi"><div class="num" id="k-prom" style="color:var(--oro-claro)">–</div><div class="lab">Promedio /100</div></div>
+      <div class="kpi"><div class="num" id="k-aprob" style="color:var(--verde)">–</div><div class="lab">% Aprobados</div></div>
+      <div class="kpi"><div class="num" id="k-disp" style="color:var(--ambar)">–</div><div class="lab">Dispersión ±</div></div>
+      <div class="kpi cert"><div class="num" id="k-cert" style="font-size:22px;padding-top:8px">–</div><div class="lab">Certificación</div></div>
+    </div>
+
+    <div class="dims">
+      <h3>Desempeño promedio por dimensión cultural</h3>
+      <div class="dimbar"><div class="row"><span>Decisión correcta</span><span id="d1v">–</span></div><div class="dtrack"><div class="dfill" id="d1" style="background:var(--verde)"></div></div></div>
+      <div class="dimbar"><div class="row"><span>Fidelidad a la regla</span><span id="d2v">–</span></div><div class="dtrack"><div class="dfill" id="d2" style="background:var(--oro)"></div></div></div>
+      <div class="dimbar"><div class="row"><span>Calidad de justificación</span><span id="d3v">–</span></div><div class="dtrack"><div class="dfill" id="d3" style="background:var(--oro-claro)"></div></div></div>
+      <div class="dimbar"><div class="row"><span>Formato y trazabilidad</span><span id="d4v">–</span></div><div class="dtrack"><div class="dfill" id="d4" style="background:var(--vino2)"></div></div></div>
+    </div>
+
+    <div class="insight" id="insight"></div>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div class="results" id="results">
+    <h3>Resultados por escenario</h3>
+    <table>
+      <thead><tr><th>Escenario</th><th>Regla</th><th>Promedio</th><th>Dispersión</th><th>Resultado</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>Laboratorio de Entrenamiento · Moscatel Perú · Sistema Autónomo IA · Cada ejecución queda registrada en Resultados_Entrenamiento</footer>
+</div>
+
+<script>
+const N8N_BASE='https://roberth25ia.app.n8n.cloud/webhook';
+// Catálogo de escenarios por agente (IDs reales de Catalogo_Escenarios)
+const CAT={
+  Calidad:[['EC-1','R1'],['EC-2','R1'],['EC-3','R1'],['EC-5','R1'],['EC-6','R1']],
+  Comercial:[['ECO-1','R2'],['ECO-2','R2'],['ECO-3','R2'],['ECO-4','R2'],['ECO-5','R2']],
+  Financiero:[['EF-1','R3'],['EF-2','R3'],['EF-3','R3'],['EF-4','R3'],['EF-5','R3']],
+  Logistico:[['EL-1','R2'],['EL-2','R2'],['EL-3','R2'],['EL-4','R2'],['EL-5','R2']],
+  Climatico:[['ECL-1','ESG'],['ECL-2','ESG'],['ECL-3','ESG'],['ECL-4','ESG'],['ECL-5','ESG']],
+  Aduanas:[['EAD-1','R2'],['EAD-2','R2'],['EAD-3','R2'],['EAD-4','R2'],['EAD-5','R2']],
+  Mercado:[['EME-1','R4'],['EME-2','R4'],['EME-3','R4'],['EME-4','R4'],['EME-5','R4']],
+};
+
+let REPS=3;
+document.querySelectorAll('#reps button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#reps button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); REPS=+b.dataset.r;
+});
+
+const $=id=>document.getElementById(id);
+const std=a=>{const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length);};
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const cls=r=>r==='APROBADO'?'AP':r==='OBSERVADO'?'OB':r==='REPROBADO'?'RE':'ER';
+
+async function ejecutarUno(agente,escId){
+  try{
+    const res=await fetch(N8N_BASE+'/entrenador',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({agente,escenario_id:escId})});
+    if(!res.ok) throw 0;
+    const txt=await res.text(); if(!txt) throw 0;
+    const v=JSON.parse(txt);
+    return {
+      total:Number(v.puntaje_total ?? v.PUNTAJE_TOTAL ?? 0),
+      d1:Number(v.decision_correcta ?? v.DECISION_CORRECTA ?? 0),
+      d2:Number(v.fidelidad ?? v.FIDELIDAD ?? 0),
+      d3:Number(v.justificacion ?? v.JUSTIFICACION ?? 0),
+      d4:Number(v.formato ?? v.FORMATO ?? 0),
+      resultado:v.resultado ?? v.RESULTADO ?? 'ERROR'
+    };
+  }catch(e){ return null; }
+}
+
+$('run').onclick=async()=>{
+  const agente=$('agente').value;
+  const escenarios=CAT[agente];
+  const total=escenarios.length*REPS;
+  $('run').disabled=true;
+  $('pwrap').classList.add('show');
+  $('results').classList.add('show');
+  $('verdict').classList.remove('show');
+  $('tbody').innerHTML='';
+  $('ptotal').textContent=total;
+  let done=0;
+
+  const porEsc=[]; // {id,regla,puntajes[],resultados[]}
+  for(const [escId,regla] of escenarios){
+    const fila={id:escId,regla,puntajes:[],dims:[[],[],[],[]],resultados:[]};
+    // fila placeholder en la tabla
+    const tr=document.createElement('tr'); tr.id='r-'+escId;
+    tr.innerHTML=`<td>${escId}</td><td>${regla}</td><td class="score">…</td><td class="disp">…</td><td>…</td>`;
+    $('tbody').appendChild(tr);
+
+    for(let i=0;i<REPS;i++){
+      $('pnow').textContent=`Ejecutando ${escId} (intento ${i+1}/${REPS})…`;
+      const r=await ejecutarUno(agente,escId);
+      done++; $('pcount').textContent=done;
+      $('pfill').style.width=(done/total*100)+'%';
+      if(r){ fila.puntajes.push(r.total); fila.resultados.push(r.resultado);
+        fila.dims[0].push(r.d1);fila.dims[1].push(r.d2);fila.dims[2].push(r.d3);fila.dims[3].push(r.d4);}
+    }
+    // actualizar fila con promedio/dispersión
+    const m=avg(fila.puntajes), s=std(fila.puntajes);
+    const aprob=fila.resultados.filter(x=>x==='APROBADO').length;
+    const veredictoMayoria=aprob>REPS/2?'APROBADO':(fila.resultados.filter(x=>x==='REPROBADO').length>REPS/2?'REPROBADO':'OBSERVADO');
+    const c=fila.puntajes.length?cls(veredictoMayoria):'ER';
+    $('r-'+escId).innerHTML=
+      `<td>${escId}</td><td>${regla}</td>`+
+      `<td class="score">${m.toFixed(1)}</td>`+
+      `<td class="disp">±${s.toFixed(1)}</td>`+
+      `<td><span class="pill p-${c}">${fila.puntajes.length?veredictoMayoria:'SIN DATO'}</span></td>`;
+    porEsc.push(fila);
+  }
+
+  $('pnow').textContent='Evaluación completa';
+  resumen(agente,porEsc);
+  $('run').disabled=false;
+};
+
+function resumen(agente,porEsc){
+  const todos=porEsc.flatMap(f=>f.puntajes);
+  const prom=avg(todos), disp=std(todos);
+  const escAprob=porEsc.filter(f=>{const a=f.resultados.filter(x=>x==='APROBADO').length;return a>f.puntajes.length/2;}).length;
+  const pctAprob=Math.round(escAprob/porEsc.length*100);
+  const dimProm=[0,1,2,3].map(i=>avg(porEsc.flatMap(f=>f.dims[i])));
+  const dimMax=[40,25,20,15];
+
+  $('vname').textContent='Resultado · Agente '+agente;
+  $('k-prom').textContent=prom.toFixed(1);
+  $('k-aprob').textContent=pctAprob+'%';
+  $('k-disp').textContent=disp.toFixed(1);
+
+  // Certificación: 100% críticos + >=85% total (proxy: todos aprobados y promedio>=80)
+  const certificado=pctAprob===100 && prom>=80;
+  $('k-cert').innerHTML=certificado?'<span class="badge b-cert">CERTIFICADO</span>':'<span class="badge b-no">NO CERT.</span>';
+
+  const dimNames=['d1','d2','d3','d4'];
+  dimProm.forEach((v,i)=>{
+    $(dimNames[i]).style.width=(v/dimMax[i]*100)+'%';
+    $(dimNames[i]+'v').textContent=v.toFixed(1)+'/'+dimMax[i];
+  });
+
+  // Interpretación automática
+  const peor=dimProm.map((v,i)=>v/dimMax[i]).reduce((min,v,i,arr)=>v<arr[min]?i:min,0);
+  const nomDim=['decisión','fidelidad a la regla','justificación','formato/trazabilidad'][peor];
+  let txt='';
+  if(certificado){ txt=`<b>${agente} está certificado.</b> Promedio ${prom.toFixed(1)}/100 con dispersión baja (±${disp.toFixed(1)}), señal de comportamiento consistente bajo la cultura.`; }
+  else if(disp>12){ txt=`<b>Inconsistencia detectada.</b> El promedio es ${prom.toFixed(1)} pero la dispersión es alta (±${disp.toFixed(1)}): el agente acierta y falla de forma irregular. Antes de certificar, estabilizar su system prompt.`; }
+  else{ txt=`<b>Brecha en ${nomDim}.</b> Es la dimensión más débil del agente. ${peor===1?'Decide bien pero no cita la regla formalmente — refuerza en el prompt que mencione R# explícitamente.':'Refuerza esa dimensión en el system prompt antes de re-evaluar.'}`; }
+  $('insight').innerHTML=txt;
+  $('insight').classList.add('show');
+  $('verdict').classList.add('show');
+}
+</script>
+</body>
+</html>
